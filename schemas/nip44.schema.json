@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/nip44.schema.json",
+  "title": "vectors/nip44/nip44.vectors.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "calc_padded_len": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "type": "integer",
+            "minimum": 32
+          }
+        ],
+        "items": false,
+        "minItems": 2
+      },
+      "minItems": 1
+    },
+    "get_conversation_key": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sec1": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "pub2": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "conversation_key": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": ["sec1", "pub2", "conversation_key"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "invalid_get_conversation_key": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sec1": {
+            "type": "string",
+            "pattern": "^[0-9a-f]*$"
+          },
+          "pub2": {
+            "type": "string",
+            "pattern": "^[0-9a-f]*$"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": ["sec1", "pub2", "note"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "get_message_keys": {
+      "type": "object",
+      "properties": {
+        "conversation_key": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "nonce": {
+                "$ref": "common.schema.json#/$defs/hex32"
+              },
+              "chacha_key": {
+                "$ref": "common.schema.json#/$defs/hex32"
+              },
+              "chacha_nonce": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{24}$"
+              },
+              "hmac_key": {
+                "$ref": "common.schema.json#/$defs/hex32"
+              }
+            },
+            "required": ["nonce", "chacha_key", "chacha_nonce", "hmac_key"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["conversation_key", "keys"],
+      "additionalProperties": false
+    },
+    "encrypt_decrypt": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "conversation_key": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "nonce": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "plaintext": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "string"
+          }
+        },
+        "required": ["conversation_key", "nonce", "plaintext", "payload"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "invalid_decrypt": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "conversation_key": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "nonce": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "plaintext": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": ["conversation_key", "nonce", "plaintext", "payload", "note"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "source",
+    "calc_padded_len",
+    "get_conversation_key",
+    "invalid_get_conversation_key",
+    "get_message_keys",
+    "encrypt_decrypt",
+    "invalid_decrypt"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/app.schema.json",
+  "title": "vectors/app/app.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "secretKey": {
+      "type": "string",
+      "pattern": "^sattleme_ck_"
+    },
+    "parsed": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "integrationKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "relays": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["team", "integrationKey", "relays"],
+      "additionalProperties": false
+    },
+    "derived": {
+      "type": "object",
+      "properties": {
+        "channelAddress": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "channelEncryptionKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "takerKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        }
+      },
+      "required": ["channelAddress", "channelEncryptionKey", "takerKey"],
+      "additionalProperties": false
+    },
+    "channel": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "common.schema.json#/$defs/event"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "t": {
+              "const": "team-channel"
+            },
+            "v": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "const": 1
+                },
+                "status": {
+                  "enum": ["active", "removed"]
+                },
+                "role": {
+                  "type": "string"
+                },
+                "profile": {
+                  "type": "object",
+                  "properties": {
+                    "businessName": {
+                      "type": "string"
+                    },
+                    "lightningAddress": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["businessName", "lightningAddress"]
+                },
+                "registryKey": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "registryReader": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "relays": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                },
+                "updatedAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                }
+              },
+              "required": [
+                "version",
+                "status",
+                "role",
+                "profile",
+                "registryKey",
+                "registryReader",
+                "relays",
+                "updatedAt"
+              ]
+            }
+          },
+          "required": ["t", "v"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["event", "value"],
+      "additionalProperties": false
+    },
+    "declaration": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "invoice": {
+          "type": "string"
+        },
+        "paymentHash": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "verifyUrl": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "fiat": {
+          "$ref": "common.schema.json#/$defs/declaredFiat"
+        },
+        "note": {
+          "type": "string"
+        },
+        "saleKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "saleSecret": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "saleAuthor": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "taker": {
+          "$ref": "common.schema.json#/$defs/hex16"
+        },
+        "address": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "outerKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "innerConversationKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "outsideBytes": {
+          "type": "integer",
+          "minimum": 256,
+          "multipleOf": 256
+        },
+        "event": {
+          "$ref": "common.schema.json#/$defs/event"
+        }
+      },
+      "required": [
+        "ref",
+        "invoice",
+        "paymentHash",
+        "verifyUrl",
+        "fiat",
+        "note",
+        "saleKey",
+        "saleSecret",
+        "saleAuthor",
+        "taker",
+        "address",
+        "outerKey",
+        "innerConversationKey",
+        "outsideBytes",
+        "event"
+      ],
+      "additionalProperties": false
+    },
+    "realInvoice": {
+      "type": "object",
+      "properties": {
+        "invoice": {
+          "type": "string"
+        },
+        "amountMsat": {
+          "$ref": "common.schema.json#/$defs/digits"
+        },
+        "timestamp": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        },
+        "expirySeconds": {
+          "type": "integer"
+        },
+        "paymentHash": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "descriptionHash": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "preimage": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        }
+      },
+      "required": [
+        "invoice",
+        "amountMsat",
+        "timestamp",
+        "expirySeconds",
+        "paymentHash",
+        "descriptionHash",
+        "preimage"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": ["source", "secretKey", "parsed", "derived", "channel", "declaration", "realInvoice"],
+  "additionalProperties": false
+}

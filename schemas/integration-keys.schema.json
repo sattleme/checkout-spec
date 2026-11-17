@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/integration-keys.schema.json",
+  "title": "vectors/integration-keys.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "teamPublicKey": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  },
+                  "integrationKey": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  },
+                  "relays": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": ["teamPublicKey", "integrationKey", "relays"],
+                "additionalProperties": false
+              },
+              {
+                "$ref": "common.schema.json#/$defs/error"
+              }
+            ]
+          }
+        },
+        "required": ["name", "key", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

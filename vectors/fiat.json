@@ -1,0 +1,417 @@
+{
+  "description": "Prices in a currency (SPEC.md §25, Prices in a currency). `cases`: the price an order gives, read as minor units of its currency (currencies.json), or refused. `digits`: what currencyDigits gives for a text (SPEC.md §4, Functions): the decimals of the currency whose code it is exactly, or null for any other text (a code in lower case, around spaces, a fund, a metal, a test code, none at all, or a name an object holds in some languages).",
+  "cases": [
+    {
+      "input": {
+        "amount": "24.50",
+        "currency": "CHF"
+      },
+      "expected": {
+        "amount": "24.50",
+        "minor": "2450",
+        "digits": 2,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": {
+        "amount": "24.5",
+        "currency": "CHF"
+      },
+      "expected": {
+        "amount": "24.50",
+        "minor": "2450",
+        "digits": 2,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": {
+        "amount": "24.500",
+        "currency": "CHF"
+      },
+      "expected": {
+        "amount": "24.50",
+        "minor": "2450",
+        "digits": 2,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": {
+        "amount": "0024.50",
+        "currency": "CHF"
+      },
+      "expected": {
+        "amount": "24.50",
+        "minor": "2450",
+        "digits": 2,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": {
+        "amount": "1500",
+        "currency": "JPY"
+      },
+      "expected": {
+        "amount": "1500",
+        "minor": "1500",
+        "digits": 0,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": {
+        "amount": "1500.0",
+        "currency": "JPY"
+      },
+      "expected": {
+        "amount": "1500",
+        "minor": "1500",
+        "digits": 0,
+        "currency": "JPY"
+      }
+    },
+    {
+      "input": {
+        "amount": "1.234",
+        "currency": "BHD"
+      },
+      "expected": {
+        "amount": "1.234",
+        "minor": "1234",
+        "digits": 3,
+        "currency": "BHD"
+      }
+    },
+    {
+      "input": {
+        "amount": "10",
+        "currency": "RSD"
+      },
+      "expected": {
+        "amount": "10",
+        "minor": "10",
+        "digits": 0,
+        "currency": "RSD"
+      }
+    },
+    {
+      "input": {
+        "amount": "10.5",
+        "currency": "RSD"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "0.01",
+        "currency": "EUR"
+      },
+      "expected": {
+        "amount": "0.01",
+        "minor": "1",
+        "digits": 2,
+        "currency": "EUR"
+      }
+    },
+    {
+      "input": {
+        "amount": "90071992547409.91",
+        "currency": "CHF"
+      },
+      "expected": {
+        "amount": "90071992547409.91",
+        "minor": "9007199254740991",
+        "digits": 2,
+        "currency": "CHF"
+      }
+    },
+    {
+      "input": {
+        "amount": "90071992547409.92",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "24.501",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1500.5",
+        "currency": "JPY"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "0",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "0.00",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "-1",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "+1",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": " 1",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1 ",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1,50",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1e2",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": ".5",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "5.",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1234567890123456",
+        "currency": "CHF"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "chf"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "XAU"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "CHE"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "BTC"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "SAT"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    },
+    {
+      "input": {
+        "amount": "1",
+        "currency": "ABC"
+      },
+      "expected": {
+        "error": "invalid_order",
+        "param": "fiat"
+      }
+    }
+  ],
+  "digits": [
+    {
+      "code": "CHF",
+      "expected": 2
+    },
+    {
+      "code": "EUR",
+      "expected": 2
+    },
+    {
+      "code": "JPY",
+      "expected": 0
+    },
+    {
+      "code": "BHD",
+      "expected": 3
+    },
+    {
+      "code": "KWD",
+      "expected": 3
+    },
+    {
+      "code": "RSD",
+      "expected": 0
+    },
+    {
+      "code": "IQD",
+      "expected": 0
+    },
+    {
+      "code": "chf",
+      "expected": null
+    },
+    {
+      "code": " CHF",
+      "expected": null
+    },
+    {
+      "code": "CHF ",
+      "expected": null
+    },
+    {
+      "code": "CHE",
+      "expected": null
+    },
+    {
+      "code": "XAU",
+      "expected": null
+    },
+    {
+      "code": "XTS",
+      "expected": null
+    },
+    {
+      "code": "XXX",
+      "expected": null
+    },
+    {
+      "code": "BTC",
+      "expected": null
+    },
+    {
+      "code": "",
+      "expected": null
+    },
+    {
+      "code": "__proto__",
+      "expected": null
+    },
+    {
+      "code": "constructor",
+      "expected": null
+    },
+    {
+      "code": "toString",
+      "expected": null
+    },
+    {
+      "code": "hasOwnProperty",
+      "expected": null
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "description": "Integration keys (SPEC.md §8, The integration key): the parts of a valid key, or the error of an invalid one.",
+  "cases": [
+    {
+      "name": "the app's vector",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "teamPublicKey": "a8455e8c7b826691785cc9814b0e69ee2658c42b66db45f1cd3d5f9c9f5507ca",
+        "integrationKey": "b8f4c0cf577c6db41ac36271db65b0ae06b6bc8d85f1a96563936b3c2dc0a209",
+        "relays": ["wss://relay.example"]
+      }
+    },
+    {
+      "name": "several relays, a port and a path",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZSxub3MubG9sOjQ0NDMscmVsYXkuZXhhbXBsZS5jaC9ub3N0cg",
+      "expected": {
+        "teamPublicKey": "a8455e8c7b826691785cc9814b0e69ee2658c42b66db45f1cd3d5f9c9f5507ca",
+        "integrationKey": "b8f4c0cf577c6db41ac36271db65b0ae06b6bc8d85f1a96563936b3c2dc0a209",
+        "relays": ["wss://relay.example", "wss://nos.lol:4443", "wss://relay.example.ch/nostr"]
+      }
+    },
+    {
+      "name": "a later format's prefix",
+      "key": "sattleme_ck2_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "the prefix sattleme_ without ck_",
+      "key": "sattleme_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "two parts",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "four parts",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ.x",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "base64 padding",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk=.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "standard base64 alphabet",
+      "key": "sattleme_ck_+EVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "non-canonical base64url (padding bits set)",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogh.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "a 31-byte key",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBw.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "a team key off the curve",
+      "key": "sattleme_ck_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "relays that are not UTF-8",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk._2E",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "relays after a byte order mark (kept: U+FEFF is no host)",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.77u_cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "no relay",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "a relay in upper case",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.UmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "a relay twice",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZSxyZWxheS5leGFtcGxl",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "eleven relays",
+      "key": "sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cjAuZXhhbXBsZSxyMS5leGFtcGxlLHIyLmV4YW1wbGUscjMuZXhhbXBsZSxyNC5leGFtcGxlLHI1LmV4YW1wbGUscjYuZXhhbXBsZSxyNy5leGFtcGxlLHI4LmV4YW1wbGUscjkuZXhhbXBsZSxyMTAuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    },
+    {
+      "name": "a space before the key",
+      "key": " sattleme_ck_qEVejHuCZpF4XMmBSw5p7iZYxCtm20XxzT1fnJ9VB8o.uPTAz1d8bbQaw2Jx22Wwrga2vI2F8allY5NrPC3Aogk.cmVsYXkuZXhhbXBsZQ",
+      "expected": {
+        "error": "invalid_key"
+      }
+    }
+  ]
+}

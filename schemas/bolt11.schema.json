@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/bolt11.schema.json",
+  "title": "vectors/bolt11.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "invoice": {
+            "type": "string"
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "network": {
+                    "enum": ["bc", "tb", "tbs", "bcrt"]
+                  },
+                  "amountMsat": {
+                    "anyOf": [
+                      {
+                        "$ref": "common.schema.json#/$defs/digits"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "timestamp": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  },
+                  "expirySeconds": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "paymentHash": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  },
+                  "descriptionHash": {
+                    "anyOf": [
+                      {
+                        "$ref": "common.schema.json#/$defs/hex32"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "network",
+                  "amountMsat",
+                  "timestamp",
+                  "expirySeconds",
+                  "paymentHash",
+                  "descriptionHash"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name", "invoice", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

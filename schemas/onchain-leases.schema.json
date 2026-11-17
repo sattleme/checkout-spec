@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/onchain-leases.schema.json",
+  "title": "vectors/onchain-leases.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "registryKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "registryReader": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "saleAuthor": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "saleSecret": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "innerConversationKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "derived": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "common.schema.json#/$defs/depositAddress"
+          },
+          "registryAddress": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "outerKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          }
+        },
+        "required": ["address", "registryAddress", "outerKey"],
+        "additionalProperties": false
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "address": {
+            "$ref": "common.schema.json#/$defs/depositAddress"
+          },
+          "event": {
+            "$ref": "common.schema.json#/$defs/event"
+          },
+          "outside": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "const": "newer"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "const": 1
+                  },
+                  "end": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  },
+                  "sealed": {
+                    "type": "string"
+                  }
+                },
+                "required": ["version", "end", "sealed"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "const": 1
+                  },
+                  "withdrawn": {
+                    "const": true
+                  }
+                },
+                "required": ["version", "withdrawn"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "inside": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "const": 1
+                  },
+                  "address": {
+                    "$ref": "common.schema.json#/$defs/depositAddress"
+                  },
+                  "sats": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "invoice": {
+                    "type": ["string", "null"]
+                  },
+                  "verifyUrl": {
+                    "type": ["string", "null"]
+                  },
+                  "createdAt": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  },
+                  "expiresAt": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  },
+                  "sale": {
+                    "type": "object"
+                  },
+                  "taker": {
+                    "$ref": "common.schema.json#/$defs/hex16"
+                  },
+                  "tolerance": {
+                    "type": "number"
+                  },
+                  "confirmed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "version",
+                  "address",
+                  "sats",
+                  "invoice",
+                  "verifyUrl",
+                  "createdAt",
+                  "expiresAt",
+                  "sale"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "tolerance": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "signature": {
+            "const": false
+          },
+          "confirmed": {
+            "type": "boolean"
+          }
+        },
+        "required": ["name", "address", "event", "outside", "inside"],
+        "additionalProperties": false
+      }
+    },
+    "leased": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "author": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "integer"
+                },
+                "outside": {
+                  "oneOf": [
+                    {
+                      "const": "newer"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "const": 1
+                        },
+                        "end": {
+                          "type": "integer"
+                        },
+                        "sealed": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["version", "end", "sealed"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "const": 1
+                        },
+                        "withdrawn": {
+                          "const": true
+                        }
+                      },
+                      "required": ["version", "withdrawn"],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "signature": {
+                  "const": false
+                },
+                "id": {
+                  "const": false
+                },
+                "eventId": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                }
+              },
+              "required": ["author", "createdAt", "outside"],
+              "additionalProperties": false
+            }
+          },
+          "t": {
+            "type": "integer"
+          },
+          "expected": {
+            "type": "boolean"
+          },
+          "checked": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": ["name", "records", "t", "expected", "checked"],
+        "additionalProperties": false
+      }
+    },
+    "confirmed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "author": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "integer"
+                },
+                "outside": {
+                  "oneOf": [
+                    {
+                      "const": "newer"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "const": 1
+                        },
+                        "end": {
+                          "type": "integer"
+                        },
+                        "sealed": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["version", "end", "sealed"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "const": 1
+                        },
+                        "withdrawn": {
+                          "const": true
+                        }
+                      },
+                      "required": ["version", "withdrawn"],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "signature": {
+                  "const": false
+                },
+                "id": {
+                  "const": false
+                },
+                "eventId": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                }
+              },
+              "required": ["author", "createdAt", "outside"],
+              "additionalProperties": false
+            }
+          },
+          "t": {
+            "type": "integer"
+          },
+          "expected": {
+            "type": "boolean"
+          },
+          "sale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lease": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "complete": {
+            "type": "boolean"
+          }
+        },
+        "required": ["name", "records", "sale", "lease", "t", "complete", "expected"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "description",
+    "registryKey",
+    "registryReader",
+    "saleAuthor",
+    "saleSecret",
+    "innerConversationKey",
+    "derived",
+    "events",
+    "leased",
+    "confirmed"
+  ],
+  "additionalProperties": false
+}

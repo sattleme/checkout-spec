@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/invoice-checks.schema.json",
+  "title": "vectors/invoice-checks.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "payRequest": {
+      "type": "object",
+      "properties": {
+        "callback": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "string"
+        }
+      },
+      "required": ["callback", "metadata"],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "object",
+            "properties": {
+              "pr": {
+                "type": "string"
+              },
+              "verify": {
+                "type": "string"
+              }
+            },
+            "required": ["pr", "verify"],
+            "additionalProperties": false
+          },
+          "sats": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "durationSeconds": {
+            "type": "integer"
+          },
+          "now": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "valid": {
+                    "const": true
+                  }
+                },
+                "required": ["valid"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "const": "invalid_invoice"
+                  },
+                  "check": {
+                    "enum": [
+                      "bolt11",
+                      "network",
+                      "amount",
+                      "description_hash",
+                      "verify_url",
+                      "duration",
+                      "clock",
+                      "expired"
+                    ]
+                  }
+                },
+                "required": ["error", "check"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": ["name", "answer", "sats", "durationSeconds", "now", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "payRequest", "cases"],
+  "additionalProperties": false
+}

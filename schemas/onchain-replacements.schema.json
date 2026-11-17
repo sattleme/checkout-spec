@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/onchain-replacements.schema.json",
+  "title": "vectors/onchain-replacements.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "txs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "txid": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "sats": {
+                  "$ref": "common.schema.json#/$defs/digits"
+                },
+                "inputs": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "common.schema.json#/$defs/coin"
+                  }
+                },
+                "order": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "listed": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["txid", "sats", "inputs", "order", "listed"],
+              "additionalProperties": false
+            }
+          },
+          "parts": {
+            "type": "object",
+            "propertyNames": {
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "additionalProperties": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sats": {
+                    "$ref": "common.schema.json#/$defs/digits"
+                  },
+                  "root": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  }
+                },
+                "required": ["sats", "root"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "required": ["name", "txs", "parts"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

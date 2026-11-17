@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/checkout-links.schema.json",
+  "title": "vectors/checkout-links.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "origins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "checkout": {},
+          "expected": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": ["checkout", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "derivations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "linkKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "address": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "encryptionKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          }
+        },
+        "required": ["linkKey", "address", "encryptionKey"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "urls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "author": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "linkKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "relays": {
+            "$ref": "common.schema.json#/$defs/relays"
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        },
+        "required": ["origin", "author", "linkKey", "relays", "url"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "fragments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fragment": {
+            "type": "string"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "enum": ["newer", "invalid", "other"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "author": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  },
+                  "linkKey": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  },
+                  "relays": {
+                    "$ref": "common.schema.json#/$defs/relays"
+                  }
+                },
+                "required": ["author", "linkKey", "relays"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": ["name", "fragment", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {},
+          "expected": {
+            "oneOf": [
+              {
+                "enum": ["newer", "invalid"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "sats": {
+                    "$ref": "common.schema.json#/$defs/digits"
+                  },
+                  "paymentHash": {
+                    "oneOf": [
+                      {
+                        "$ref": "common.schema.json#/$defs/hex32"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "onchainAddress": {
+                    "oneOf": [
+                      {
+                        "$ref": "common.schema.json#/$defs/depositAddress"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "expiresAt": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  },
+                  "redirect": {
+                    "type": ["string", "null"]
+                  },
+                  "rest": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "author": {
+                            "$ref": "common.schema.json#/$defs/hex32"
+                          },
+                          "key": {
+                            "$ref": "common.schema.json#/$defs/hex32"
+                          }
+                        },
+                        "required": ["author", "key"],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "sats",
+                  "paymentHash",
+                  "onchainAddress",
+                  "expiresAt",
+                  "redirect",
+                  "rest"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": ["name", "value", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "origins", "derivations", "urls", "fragments", "records"],
+  "additionalProperties": false
+}

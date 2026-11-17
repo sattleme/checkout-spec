@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/fiat.schema.json",
+  "title": "vectors/fiat.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "$ref": "common.schema.json#/$defs/fiatInput"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "string"
+                  },
+                  "minor": {
+                    "$ref": "common.schema.json#/$defs/digits"
+                  },
+                  "digits": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 8
+                  },
+                  "currency": {
+                    "$ref": "common.schema.json#/$defs/currency"
+                  }
+                },
+                "required": ["amount", "minor", "digits", "currency"],
+                "additionalProperties": false
+              },
+              {
+                "$ref": "common.schema.json#/$defs/error"
+              }
+            ]
+          }
+        },
+        "required": ["input", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "digits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 8
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["code", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "cases", "digits"],
+  "additionalProperties": false
+}

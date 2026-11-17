@@ -1,0 +1,446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/onchain-rests.schema.json",
+  "title": "vectors/onchain-rests.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "integrationKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "address": {
+            "$ref": "common.schema.json#/$defs/depositAddress"
+          },
+          "expiresAt": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "restKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "restSecret": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "restAuthor": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "restEncryptionKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "records": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "paymentHash": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "address": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                }
+              },
+              "required": ["paymentHash", "address"],
+              "additionalProperties": false
+            }
+          },
+          "acceptanceAddress": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          }
+        },
+        "required": [
+          "ref",
+          "address",
+          "expiresAt",
+          "restKey",
+          "restSecret",
+          "restAuthor",
+          "restEncryptionKey",
+          "records",
+          "acceptanceAddress"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "records": {
+      "type": "object",
+      "properties": {
+        "restKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "restAuthor": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "link": {
+          "type": "object",
+          "properties": {
+            "sats": {
+              "$ref": "common.schema.json#/$defs/digits"
+            },
+            "createdAt": {
+              "$ref": "common.schema.json#/$defs/unixSeconds"
+            },
+            "expiresAt": {
+              "$ref": "common.schema.json#/$defs/unixSeconds"
+            }
+          },
+          "required": ["sats", "createdAt", "expiresAt"],
+          "additionalProperties": false
+        },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "event": {},
+              "expected": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "const": "newer"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "invoice": {
+                        "type": "string",
+                        "pattern": "^lnbc"
+                      },
+                      "paymentHash": {
+                        "$ref": "common.schema.json#/$defs/hex32"
+                      },
+                      "verifyUrl": {
+                        "type": "string",
+                        "pattern": "^https://"
+                      },
+                      "sats": {
+                        "$ref": "common.schema.json#/$defs/digits"
+                      }
+                    },
+                    "required": ["invoice", "paymentHash", "verifyUrl", "sats"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["name", "event", "expected"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["restKey", "restAuthor", "link", "cases"],
+      "additionalProperties": false
+    },
+    "acceptances": {
+      "type": "object",
+      "properties": {
+        "restKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "restAuthor": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "link": {
+          "type": "object",
+          "properties": {
+            "sats": {
+              "$ref": "common.schema.json#/$defs/digits"
+            }
+          },
+          "required": ["sats"],
+          "additionalProperties": false
+        },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "event": {},
+              "expected": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "const": "newer"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "received": {
+                        "$ref": "common.schema.json#/$defs/digits"
+                      }
+                    },
+                    "required": ["received"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["name", "event", "expected"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["restKey", "restAuthor", "link", "cases"],
+      "additionalProperties": false
+    },
+    "declarations": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registryKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "registryReader": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "event": {
+                "$ref": "common.schema.json#/$defs/event"
+              },
+              "expected": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "invoice": {
+                        "type": "string"
+                      },
+                      "note": {
+                        "type": "string"
+                      },
+                      "rest": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "address": {
+                                "$ref": "common.schema.json#/$defs/depositAddress"
+                              },
+                              "expiresAt": {
+                                "type": "integer",
+                                "minimum": 0
+                              }
+                            },
+                            "required": ["address", "expiresAt"],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": ["invoice", "note", "rest"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["name", "event", "expected"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["ref", "registryKey", "registryReader", "cases"],
+      "additionalProperties": false
+    },
+    "asking": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sats": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "expiresAt": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "now": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "received": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "rests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "paymentHash": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "sats": {
+                  "$ref": "common.schema.json#/$defs/digits"
+                },
+                "createdAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "expiresAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "paid": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["id", "paymentHash", "sats", "createdAt", "expiresAt", "paid"],
+              "additionalProperties": false
+            }
+          },
+          "lease": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "sats": {
+                    "$ref": "common.schema.json#/$defs/digits"
+                  },
+                  "expiresAt": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  }
+                },
+                "required": ["sats", "expiresAt"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "sendable": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "$ref": "common.schema.json#/$defs/digits"
+              },
+              "max": {
+                "$ref": "common.schema.json#/$defs/digits"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "rest": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sats": {
+                        "$ref": "common.schema.json#/$defs/digits"
+                      },
+                      "invoice": {
+                        "type": ["string", "null"]
+                      }
+                    },
+                    "required": ["sats", "invoice"],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "ask": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sats": {
+                        "$ref": "common.schema.json#/$defs/digits"
+                      },
+                      "expirySeconds": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": ["sats", "expirySeconds"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["rest", "ask"],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "name",
+          "sats",
+          "expiresAt",
+          "now",
+          "received",
+          "rests",
+          "lease",
+          "sendable",
+          "expected"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "description",
+    "integrationKey",
+    "keys",
+    "records",
+    "acceptances",
+    "declarations",
+    "asking"
+  ],
+  "additionalProperties": false
+}

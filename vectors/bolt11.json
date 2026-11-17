@@ -1,0 +1,168 @@
+{
+  "description": "BOLT11 invoices (SPEC.md §19, BOLT11): the fields of a valid invoice (amounts in millisatoshis, as strings), or null for an invalid one. The signature is not checked.",
+  "cases": [
+    {
+      "name": "a real breez.tips invoice",
+      "invoice": "lnbc210n1p4vvsmgpp5mpepfjvqftecc5jg50t6j7pa929spkv30zwx04xj9jql8qhh9qussp5r7d725tw2vf7345mtmuuypcsav4sh2qp6663qxs2al3q8855qwxqxqzurnp4qvyndeaqzman7h898jxm98dzkm0mlrsx36s93smrur7h0azyyuxc5rzjqwghf7zxvfkxq5a6sr65g0gdkv768p83mhsnt0msszapamzx2qvuxqqqqrt49lmtcqqqqqqqqqqq86qq9qcqzpuhp5gs8l6ck7jdsa9qx8u2ydgl6q933mn2047j5nw9f9xeknle3ujltq9qyyssqsjvk6t43cmgncdn8z783r2gym2u80dh5xa2xmw2u0a9aykhww3z9tdj4m5kvxt6yme90c0g0gauf008hr70lx5jdkzfzn7hwa73axxsqy9rcwv",
+      "expected": {
+        "network": "bc",
+        "amountMsat": "21000",
+        "timestamp": 1791378280,
+        "expirySeconds": 899,
+        "paymentHash": "d87214c9804af38c5248a3d7a9783d2a8b00d991789c67d4d22c81f382f72839",
+        "descriptionHash": "440ffd62de9361d280c7e288d47f402c63b9a9f5f4a9371525366d3fe63c97d6"
+      }
+    },
+    {
+      "name": "the same, in upper case",
+      "invoice": "LNBC210N1P4VVSMGPP5MPEPFJVQFTECC5JG50T6J7PA929SPKV30ZWX04XJ9JQL8QHH9QUSSP5R7D725TW2VF7345MTMUUYPCSAV4SH2QP6663QXS2AL3Q8855QWXQXQZURNP4QVYNDEAQZMAN7H898JXM98DZKM0MLRSX36S93SMRUR7H0AZYYUXC5RZJQWGHF7ZXVFKXQ5A6SR65G0GDKV768P83MHSNT0MSSZAPAMZX2QVUXQQQQRT49LMTCQQQQQQQQQQQ86QQ9QCQZPUHP5GS8L6CK7JDSA9QX8U2YDGL6Q933MN2047J5NW9F9XEKNLE3UJLTQ9QYYSSQSJVK6T43CMGNCDN8Z783R2GYM2U80DH5XA2XMW2U0A9AYKHWW3Z9TDJ4M5KVXT6YME90C0G0GAUF008HR70LX5JDKZFZN7HWA73AXXSQY9RCWV",
+      "expected": {
+        "network": "bc",
+        "amountMsat": "21000",
+        "timestamp": 1791378280,
+        "expirySeconds": 899,
+        "paymentHash": "d87214c9804af38c5248a3d7a9783d2a8b00d991789c67d4d22c81f382f72839",
+        "descriptionHash": "440ffd62de9361d280c7e288d47f402c63b9a9f5f4a9371525366d3fe63c97d6"
+      }
+    },
+    {
+      "name": "the same in upper case, the Kelvin sign (U+212A) in place of a K",
+      "invoice": "LNBC210N1P4VVSMGPP5MPEPFJVQFTECC5JG50T6J7PA929SPKV30ZWX04XJ9JQL8QHH9QUSSP5R7D725TW2VF7345MTMUUYPCSAV4SH2QP6663QXS2AL3Q8855QWXQXQZURNP4QVYNDEAQZMAN7H898JXM98DZKM0MLRSX36S93SMRUR7H0AZYYUXC5RZJQWGHF7ZXVFKXQ5A6SR65G0GDKV768P83MHSNT0MSSZAPAMZX2QVUXQQQQRT49LMTCQQQQQQQQQQQ86QQ9QCQZPUHP5GS8L6CK7JDSA9QX8U2YDGL6Q933MN2047J5NW9F9XEKNLE3UJLTQ9QYYSSQSJVK6T43CMGNCDN8Z783R2GYM2U80DH5XA2XMW2U0A9AYKHWW3Z9TDJ4M5KVXT6YME90C0G0GAUF008HR70LX5JDKZFZN7HWA73AXXSQY9RCWV",
+      "expected": null
+    },
+    {
+      "name": "no amount, no expiry field (3600 s)",
+      "invoice": "lnbc1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6l32sw",
+      "expected": {
+        "network": "bc",
+        "amountMsat": null,
+        "timestamp": 1791378000,
+        "expirySeconds": 3600,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "an amount in pico-bitcoins",
+      "invoice": "lnbc12340p1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsxqzjcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrfxzlz",
+      "expected": {
+        "network": "bc",
+        "amountMsat": "1234",
+        "timestamp": 1791378000,
+        "expirySeconds": 600,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "testnet",
+      "invoice": "lntb10u1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk8h5p0",
+      "expected": {
+        "network": "tb",
+        "amountMsat": "1000000",
+        "timestamp": 1791378000,
+        "expirySeconds": 3600,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "two expiry fields: the last counts",
+      "invoice": "lnbc1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fsxqzpuxqzuyhp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy9eq79",
+      "expected": {
+        "network": "bc",
+        "amountMsat": null,
+        "timestamp": 1791378000,
+        "expirySeconds": 900,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "an expiry field of 7 words",
+      "invoice": "lnbc1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fsxq8qqqqqqphp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqfhw2hg",
+      "expected": {
+        "network": "bc",
+        "amountMsat": null,
+        "timestamp": 1791378000,
+        "expirySeconds": 1,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "an expiry field of 8 words",
+      "invoice": "lnbc1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fsxqgqqqqqqqphp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq2c9pju",
+      "expected": null
+    },
+    {
+      "name": "an expiry field of 8 words after a valid one",
+      "invoice": "lnbc1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fsxqzpuxqgqqqqqqqphp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz26mp9",
+      "expected": null
+    },
+    {
+      "name": "a payment hash field of the wrong length is skipped",
+      "invoice": "lnbc1p4vvsjsppnppppppppppppppppppppppppppppppppppppppppppppppppppppp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqra8m9h",
+      "expected": {
+        "network": "bc",
+        "amountMsat": null,
+        "timestamp": 1791378000,
+        "expirySeconds": 3600,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "no payment hash",
+      "invoice": "lnbc1p4vvsjshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqfa9zyl",
+      "expected": null
+    },
+    {
+      "name": "21 million bitcoins",
+      "invoice": "lnbc210000001p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq5dk96w",
+      "expected": {
+        "network": "bc",
+        "amountMsat": "2100000000000000000",
+        "timestamp": 1791378000,
+        "expirySeconds": 3600,
+        "paymentHash": "72cd6e8422c407fb6d098690f1130b7ded7ec2f7f5e1d30bd9d521f015363793",
+        "descriptionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    {
+      "name": "more than 21 million bitcoins",
+      "invoice": "lnbc210000011p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq7a9xed",
+      "expected": null
+    },
+    {
+      "name": "pico-bitcoins that are not whole millisatoshis",
+      "invoice": "lnbc12345p1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq5ua9ej",
+      "expected": null
+    },
+    {
+      "name": "an amount with a leading zero",
+      "invoice": "lnbc01u1p4vvsjspp5wtxkappzcsrlkmgfs6g0zyct0hkhashh7hsaxz7e65slq9fkx7fshp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqnvvy6f",
+      "expected": null
+    },
+    {
+      "name": "mixed case",
+      "invoice": "LNBC210N1P4vvsmgpp5mpepfjvqftecc5jg50t6j7pa929spkv30zwx04xj9jql8qhh9qussp5r7d725tw2vf7345mtmuuypcsav4sh2qp6663qxs2al3q8855qwxqxqzurnp4qvyndeaqzman7h898jxm98dzkm0mlrsx36s93smrur7h0azyyuxc5rzjqwghf7zxvfkxq5a6sr65g0gdkv768p83mhsnt0msszapamzx2qvuxqqqqrt49lmtcqqqqqqqqqqq86qq9qcqzpuhp5gs8l6ck7jdsa9qx8u2ydgl6q933mn2047j5nw9f9xeknle3ujltq9qyyssqsjvk6t43cmgncdn8z783r2gym2u80dh5xa2xmw2u0a9aykhww3z9tdj4m5kvxt6yme90c0g0gauf008hr70lx5jdkzfzn7hwa73axxsqy9rcwv",
+      "expected": null
+    },
+    {
+      "name": "a space around it",
+      "invoice": " lnbc210n1p4vvsmgpp5mpepfjvqftecc5jg50t6j7pa929spkv30zwx04xj9jql8qhh9qussp5r7d725tw2vf7345mtmuuypcsav4sh2qp6663qxs2al3q8855qwxqxqzurnp4qvyndeaqzman7h898jxm98dzkm0mlrsx36s93smrur7h0azyyuxc5rzjqwghf7zxvfkxq5a6sr65g0gdkv768p83mhsnt0msszapamzx2qvuxqqqqrt49lmtcqqqqqqqqqqq86qq9qcqzpuhp5gs8l6ck7jdsa9qx8u2ydgl6q933mn2047j5nw9f9xeknle3ujltq9qyyssqsjvk6t43cmgncdn8z783r2gym2u80dh5xa2xmw2u0a9aykhww3z9tdj4m5kvxt6yme90c0g0gauf008hr70lx5jdkzfzn7hwa73axxsqy9rcwv",
+      "expected": null
+    },
+    {
+      "name": "a wrong checksum",
+      "invoice": "lnbc210n1p4vvsmgpp5mpepfjvqftecc5jg50t6j7pa929spkv30zwx04xj9jql8qhh9qussp5r7d725tw2vf7345mtmuuypcsav4sh2qp6663qxs2al3q8855qwxqxqzurnp4qvyndeaqzman7h898jxm98dzkm0mlrsx36s93smrur7h0azyyuxc5rzjqwghf7zxvfkxq5a6sr65g0gdkv768p83mhsnt0msszapamzx2qvuxqqqqrt49lmtcqqqqqqqqqqq86qq9qcqzpuhp5gs8l6ck7jdsa9qx8u2ydgl6q933mn2047j5nw9f9xeknle3ujltq9qyyssqsjvk6t43cmgncdn8z783r2gym2u80dh5xa2xmw2u0a9aykhww3z9tdj4m5kvxt6yme90c0g0gauf008hr70lx5jdkzfzn7hwa73axxsqy9rcwq",
+      "expected": null
+    },
+    {
+      "name": "not lightning",
+      "invoice": "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+      "expected": null
+    }
+  ]
+}

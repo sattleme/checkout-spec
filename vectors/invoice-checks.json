@@ -1,0 +1,327 @@
+{
+  "description": "The checks of an invoice the Lightning address answered (SPEC.md §18, Invoice checks), in their order: each case fails the check it names (`check`), or passes them all. The pay request: `payRequest`.",
+  "payRequest": {
+    "callback": "https://breez.tips/lnurlp/shop/invoice",
+    "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]"
+  },
+  "cases": [
+    {
+      "name": "valid",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid, verify URL on the callback's host with another path",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips/v/1"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "name": "not BOLT11",
+      "answer": {
+        "pr": "lnbc1notaninvoice",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "bolt11"
+      }
+    },
+    {
+      "name": "testnet",
+      "answer": {
+        "pr": "lntb10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqql3jrel",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "network"
+      }
+    },
+    {
+      "name": "another amount",
+      "answer": {
+        "pr": "lnbc9990n1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkanc2l",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "amount"
+      }
+    },
+    {
+      "name": "no amount",
+      "answer": {
+        "pr": "lnbc1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz4tgn6",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "amount"
+      }
+    },
+    {
+      "name": "another merchant",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5fafumgvv9w4qcq65hd0e50ktuhk3926d3cgm4peu9ug3vyszh9zsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8japct",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "description_hash"
+      }
+    },
+    {
+      "name": "no description hash",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqjt29mg",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "description_hash"
+      }
+    },
+    {
+      "name": "verify URL in http",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "http://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL on another host",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://evil.example/verify"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL not a URL",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "verify"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL with the port written (443): the callback's host",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips:443/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "name": "verify URL on another port",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips:8443/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL with the host in upper case",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://Breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL with a user name",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://user@breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL with a backslash",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips\\@evil.example/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "verify URL on an IP address",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://10.0.0.1/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "verify_url"
+      }
+    },
+    {
+      "name": "longer than asked",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzu9qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj8y288",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "duration"
+      }
+    },
+    {
+      "name": "no time at all",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq4ld2sh",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378000,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "expired"
+      }
+    },
+    {
+      "name": "dated 301 s ago",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378301,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "clock"
+      }
+    },
+    {
+      "name": "dated 301 s ahead",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791377699,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "clock"
+      }
+    },
+    {
+      "name": "dated 300 s ago",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzuyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsayww5",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 900,
+      "now": 1791378300,
+      "expected": {
+        "valid": true
+      }
+    },
+    {
+      "name": "dated 299 s ago, over after 60 s",
+      "answer": {
+        "pr": "lnbc10u1p4vvsjspp5wkrhhdqa8ya4lwz9tnnqanvdmgqp6p33vjttzn0607y4v4hwef9qhp5qj0pc46elqth2ltysa29kfqe735jwwd4rqs4pru2hefkl8t3cfmsxqzpuqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq27kcfw",
+        "verify": "https://breez.tips/lnurlp/verify/75877bb41d393b5fb8455ce60ecd8dda001d06316496b14dfa7f895656eeca4a"
+      },
+      "sats": "1000",
+      "durationSeconds": 60,
+      "now": 1791378299,
+      "expected": {
+        "error": "invalid_invoice",
+        "check": "expired"
+      }
+    }
+  ]
+}

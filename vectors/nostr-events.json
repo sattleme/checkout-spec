@@ -1,0 +1,113 @@
+{
+  "description": "Event ids (SPEC.md §11, Nostr events): the SHA-256 of the UTF-8 of `serialized`, the JSON array [0, pubkey, created_at, kind, tags, content] of `event` without whitespace, its numbers written as integers whatever their spelling here, its strings as JavaScript's JSON.stringify writes them: `\"` and `\\` escaped, U+0008, U+0009, U+000A, U+000C and U+000D as \\b, \\t, \\n, \\f and \\r, any other character below U+0020 as \\u and four lowercase hex digits, every other character as it is.",
+  "cases": [
+    {
+      "name": "a record as this protocol writes it",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000,
+        "kind": 30078,
+        "tags": [["d", "a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f"]],
+        "content": "Ag/+AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,30078,[[\"d\",\"a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f\"]],\"Ag/+AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\"]",
+      "id": "5b27895a2d9e9e7534dc66118f683b03f6751dd3c95f0fa35564ae4a131bf1a6"
+    },
+    {
+      "name": "created_at written 1791378000.0: written as an integer",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000.0,
+        "kind": 30078,
+        "tags": [["d", "a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f"]],
+        "content": "AgAB"
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,30078,[[\"d\",\"a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f\"]],\"AgAB\"]",
+      "id": "a1e14c226e3e7ef39a50b950fe0e897888881f255e8d348c78f6d1f85eb4b015"
+    },
+    {
+      "name": "created_at written 1.791378e9: written as an integer",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1.791378e9,
+        "kind": 30078,
+        "tags": [["d", "a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f"]],
+        "content": "AgAB"
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,30078,[[\"d\",\"a6d9a0f4b0b5e4e0c3a2b9f1d6e7c8b9a0f1e2d3c4b5a69788796a5b4c3d2e1f\"]],\"AgAB\"]",
+      "id": "a1e14c226e3e7ef39a50b950fe0e897888881f255e8d348c78f6d1f85eb4b015"
+    },
+    {
+      "name": "kind 0, created_at 0, no tag, no content",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 0,
+        "kind": 0,
+        "tags": [],
+        "content": ""
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",0,0,[],\"\"]",
+      "id": "438633166bd72a6b099ca89b06018a96fc9a175ce81b44a853b1242fcca7ae0b"
+    },
+    {
+      "name": "the largest created_at, 2^53 - 1",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 9007199254740991,
+        "kind": 65535,
+        "tags": [],
+        "content": "x"
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",9007199254740991,65535,[],\"x\"]",
+      "id": "4d438f777d17bacfecf651098db82446fd5c501842261fce2fb1347fb6c5a152"
+    },
+    {
+      "name": "the seven escapes NIP-01 names",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000,
+        "kind": 1,
+        "tags": [],
+        "content": "a\"b\\c\bd\te\nf\fg\rh"
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,1,[],\"a\\\"b\\\\c\\bd\\te\\nf\\fg\\rh\"]",
+      "id": "6194ec2088ff7bd61b397b7530f37cac66bd6fc8dbf09c1ab8b3433f3d379aee"
+    },
+    {
+      "name": "any other character below U+0020: \\u and four lowercase hex digits",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000,
+        "kind": 1,
+        "tags": [],
+        "content": "\u0000\u0001\u000b\u000e\u001b\u001f."
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,1,[],\"\\u0000\\u0001\\u000b\\u000e\\u001b\\u001f.\"]",
+      "id": "63e32c523f3222ea080120acb54048ee3a91d21adc3e007c3a390b04df29aa77"
+    },
+    {
+      "name": "every other character as it is: no escape",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000,
+        "kind": 1,
+        "tags": [],
+        "content": "/<>&'`~ é  ☃😀"
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,1,[],\"/<>&'`~ é  ☃😀\"]",
+      "id": "9667948e08a6e3b8018cba0f88f1085b4197e7a5131e13f8ad945850f08b7f7b"
+    },
+    {
+      "name": "tags: the same rules",
+      "event": {
+        "pubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        "created_at": 1791378000,
+        "kind": 30078,
+        "tags": [["d", "a\u0001b"], ["t", "é/<\n\"\\"], ["e"]],
+        "content": ""
+      },
+      "serialized": "[0,\"79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798\",1791378000,30078,[[\"d\",\"a\\u0001b\"],[\"t\",\"é/<\\n\\\"\\\\\"],[\"e\"]],\"\"]",
+      "id": "a459308509faa9e5840c6b4882519463bc5d6c3039f83d0bc6bd67769d56416d"
+    }
+  ]
+}

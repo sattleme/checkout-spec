@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/earlier-invoices.schema.json",
+  "title": "vectors/earlier-invoices.json",
+  "type": "object",
+  "$defs": {
+    "event": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        },
+        "id": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        }
+      },
+      "required": ["createdAt", "id"],
+      "additionalProperties": false
+    },
+    "lease": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "common.schema.json#/$defs/depositAddress"
+        },
+        "invoice": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        },
+        "expiresAt": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "event": {
+          "$ref": "#/$defs/event"
+        },
+        "sentBy": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["address", "invoice", "createdAt", "expiresAt", "event"],
+      "additionalProperties": false
+    },
+    "withdrawal": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "common.schema.json#/$defs/depositAddress"
+        },
+        "withdrawn": {
+          "const": true
+        },
+        "event": {
+          "$ref": "#/$defs/event"
+        },
+        "sentBy": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["address", "withdrawn", "event"],
+      "additionalProperties": false
+    },
+    "index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "indices": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/index"
+      },
+      "uniqueItems": true
+    },
+    "newer": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "common.schema.json#/$defs/depositAddress"
+        },
+        "newer": {
+          "const": true
+        },
+        "event": {
+          "$ref": "#/$defs/event"
+        },
+        "sentBy": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["address", "newer", "event"],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "relays": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relays": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "now": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "declarations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "invoice": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "paymentHash": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "createdAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "expiresAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "declaredAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "rest": {
+                  "const": true
+                },
+                "sentBy": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": ["invoice", "paymentHash", "createdAt", "expiresAt", "declaredAt"],
+              "additionalProperties": false
+            }
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/lease"
+                },
+                {
+                  "$ref": "#/$defs/withdrawal"
+                },
+                {
+                  "$ref": "#/$defs/newer"
+                }
+              ]
+            }
+          },
+          "statuses": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "enum": ["open", "unconfirmed", "paid"]
+                    },
+                    "received": {
+                      "$ref": "common.schema.json#/$defs/digits"
+                    }
+                  },
+                  "required": ["state"],
+                  "additionalProperties": false
+                },
+                {
+                  "$ref": "common.schema.json#/$defs/error"
+                }
+              ]
+            }
+          },
+          "readFails": {
+            "const": true
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "invoices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "paymentHash": {
+                      "oneOf": [
+                        {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "onchainAddress": {
+                      "oneOf": [
+                        {
+                          "$ref": "common.schema.json#/$defs/depositAddress"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "$ref": "common.schema.json#/$defs/unixSeconds"
+                    },
+                    "declaredAt": {
+                      "$ref": "common.schema.json#/$defs/unixSeconds"
+                    }
+                  },
+                  "required": ["paymentHash", "onchainAddress", "createdAt", "declaredAt"],
+                  "additionalProperties": false
+                }
+              },
+              "mayBePaid": {
+                "$ref": "#/$defs/indices"
+              },
+              "checked": {
+                "$ref": "#/$defs/indices"
+              },
+              "outcome": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "handOut": {
+                        "$ref": "#/$defs/index"
+                      }
+                    },
+                    "required": ["handOut"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "orderPaid": {
+                        "$ref": "#/$defs/index"
+                      }
+                    },
+                    "required": ["orderPaid"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "$ref": "common.schema.json#/$defs/error"
+                  }
+                ]
+              }
+            },
+            "required": ["invoices", "mayBePaid", "checked", "outcome"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "now", "declarations", "records", "expected"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "relays", "cases"],
+  "additionalProperties": false
+}

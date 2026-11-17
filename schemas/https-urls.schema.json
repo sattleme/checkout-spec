@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/https-urls.schema.json",
+  "title": "vectors/https-urls.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "urls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 65535
+                  }
+                },
+                "required": ["host", "port"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["url", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "sameHost": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "b": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "expected": {
+            "type": "boolean"
+          }
+        },
+        "required": ["a", "b", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "lightningAddresses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "payUrl": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^https://"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["address", "payUrl"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "urls", "sameHost", "lightningAddresses"],
+  "additionalProperties": false
+}

@@ -1,0 +1,85 @@
+{
+  "description": "Sats for a price in a currency at the price of one bitcoin (SPEC.md §25, Prices in a currency): ⌈minor × 10^8 / (price × 10^digits)⌉, exact, rounded up to the next whole sat.",
+  "cases": [
+    {
+      "fiat": {
+        "amount": "24.50",
+        "currency": "CHF"
+      },
+      "price": "69012",
+      "sats": "35502"
+    },
+    {
+      "fiat": {
+        "amount": "1.00",
+        "currency": "CHF"
+      },
+      "price": "100000",
+      "sats": "1000"
+    },
+    {
+      "fiat": {
+        "amount": "1500",
+        "currency": "JPY"
+      },
+      "price": "15000000",
+      "sats": "10000"
+    },
+    {
+      "fiat": {
+        "amount": "0.01",
+        "currency": "CHF"
+      },
+      "price": "1000000",
+      "sats": "1"
+    },
+    {
+      "fiat": {
+        "amount": "24.50",
+        "currency": "CHF"
+      },
+      "price": "69025.1084416666694295",
+      "sats": "35495"
+    },
+    {
+      "fiat": {
+        "amount": "0.001",
+        "currency": "BHD"
+      },
+      "price": "250000",
+      "sats": "1"
+    },
+    {
+      "fiat": {
+        "amount": "90071992547409.91",
+        "currency": "CHF"
+      },
+      "price": "69012",
+      "sats": "130516421125905510"
+    },
+    {
+      "fiat": {
+        "amount": "1.00",
+        "currency": "CHF"
+      },
+      "price": "8e-8",
+      "sats": "1250000000000000"
+    },
+    {
+      "fiat": {
+        "amount": "5",
+        "currency": "JPY"
+      },
+      "price": "163.42",
+      "sats": "3059602"
+    },
+    {
+      "fiat": {
+        "amount": "19.99",
+        "currency": "EUR"
+      },
+      "price": "61234.5678",
+      "sats": "32645"
+    }
+  ]
+}

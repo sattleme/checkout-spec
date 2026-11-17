@@ -1,0 +1,2504 @@
+{
+  "description": "An order's earlier invoices (SPEC.md §21), from the sale's records as they open, read on every relay of a list of `relays`. `declarations`: the sale's declarations, each with its invoice (`invoice`, here a stand-in for its BOLT11 string), its `paymentHash`, `createdAt` and `expiresAt` (its BOLT11 timestamp, and timestamp + expiry), `declaredAt` (its event's created_at) and `rest` true for a declaration with `rest` (absent: none). `records`: the sale's records at the registry addresses of deposit addresses, each a lease (its JSON's `address`, `createdAt`, `expiresAt`, `invoice`, the declared invoice it names in any ASCII case or null for an order paid on-chain only, and `confirmed`, absent when the JSON has none: not confirmed), a withdrawal (`withdrawn` true) or a record of a newer format (`newer` true), at the registry address of `address`, each with its event's `createdAt` and `id`. Every record and declaration has `sentBy`, how many relays of the list sent it (absent: all of them); a case's `relays`, when given, is its list's length instead. `expected.invoices`: the DeclaredInvoices in their order, each its `paymentHash` (null for one a lease gives), `onchainAddress`, `createdAt` and `declaredAt`. Step 1 of the check at `now`: `expected.mayBePaid`, the invoices (indices in `expected.invoices`) that may still be paid; `expected.checked`, those whose payment step 1 checks: every one that may still be paid, even alone; `statuses`, the result of each invoice's payment check should step 1 check it (its `state`, with `received` when above 0, or an error; absent: it checks none); `expected.outcome`: null when none may still be paid (step 2 follows), else the invoice handed out (`handOut`, with `invoice_pending`), `orderPaid` (the invoice `order_paid` carries) or the error. `readFails`: fewer than a majority of the relays answer the sale's records read again in step 1 (absent: a majority answers); a paid invoice, then an error of a payment check, decide before it.",
+  "relays": 3,
+  "cases": [
+    {
+      "name": "a declaration and its marked lease: its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a declaration and its lease as first published, not confirmed: no address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a declaration and a lease without confirmed, which is not confirmed: no address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a lease naming its invoice in upper case: its address (ASCII case ignored)",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "LNBC490U1P111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "the lease's mark, newer, replaces the lease as first published: its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "the lease withdrawn: no address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "withdrawn": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a withdrawal older than the lease replaces nothing: its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "withdrawn": true,
+          "event": {
+            "createdAt": 1791377780,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a withdrawal and the mark in one second, the withdrawal's id the lower: no address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "22222222222222222222222222222222222222222222222222222222222222ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "withdrawn": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "11111111111111111111111111111111111111111111111111111111111111ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a withdrawal and the mark in one second, the mark's id the lower: its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "11111111111111111111111111111111111111111111111111111111111111ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "withdrawn": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "22222222222222222222222222222222222222222222222222222222222222ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a record of a newer format, the newest at its address: no lease there",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "newer": true,
+          "event": {
+            "createdAt": 1791378285,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a record of a newer format older than the lease: its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "newer": true,
+          "event": {
+            "createdAt": 1791377780,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "an order paid on-chain only, its lease marked: one invoice, declared at its mark's date",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378282
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "an order paid on-chain only, its lease not confirmed: no invoice",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [],
+        "mayBePaid": [],
+        "checked": [],
+        "outcome": null
+      }
+    },
+    {
+      "name": "an order paid on-chain only, its lease without confirmed: no invoice",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [],
+        "mayBePaid": [],
+        "checked": [],
+        "outcome": null
+      }
+    },
+    {
+      "name": "a lease naming an invoice that has no declaration: left out",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [],
+        "mayBePaid": [],
+        "checked": [],
+        "outcome": null
+      }
+    },
+    {
+      "name": "a declaration of a rest invoice: no invoice of the order",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378580,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378583,
+          "rest": true
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a try withdrawn on one address, the next one marked: the next one's address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378286
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "withdrawn": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378283,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378284,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378286
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "a try whose withdrawal was not read, the next one marked: the next one's address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378286
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378281,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378284,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378286
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "two confirmed leases name one invoice: the newest event gives its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378286
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378285,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378286
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "two confirmed leases name one invoice in one second: the lowest id gives its address",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378286
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "22222222222222222222222222222222222222222222222222222222222222ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": "lnbc490u1p111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "11111111111111111111111111111111111111111111111111111111111111ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378286
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "sorted by createdAt, then payment hash (none first), then address",
+      "now": 1791379380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378284
+        },
+        {
+          "invoice": "lnbc490u1p333333333333",
+          "paymentHash": "3333333333333333333333333333333333333333333333333333333333333333",
+          "createdAt": 1791378270,
+          "expiresAt": 1791379170,
+          "declaredAt": 1791378273
+        }
+      ],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          }
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "3333333333333333333333333333333333333333333333333333333333333333",
+            "onchainAddress": null,
+            "createdAt": 1791378270,
+            "declaredAt": 1791378273
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378282
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378282
+          },
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378284
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [],
+        "checked": [],
+        "outcome": null
+      }
+    },
+    {
+      "name": "at expiresAt + 119: it may still be paid, handed out",
+      "now": 1791379299,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "one may still be paid, and it was: order_paid, never handed out again",
+      "now": 1791379299,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "orderPaid": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "paid"
+        }
+      ]
+    },
+    {
+      "name": "one may still be paid, its payment being confirmed on-chain: handed out",
+      "now": 1791379299,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "handOut": 0
+        }
+      },
+      "statuses": [
+        {
+          "state": "unconfirmed"
+        }
+      ]
+    },
+    {
+      "name": "one may still be paid, its check fails: its error (it may have been paid)",
+      "now": 1791379299,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [0],
+        "checked": [0],
+        "outcome": {
+          "error": "network"
+        }
+      },
+      "statuses": [
+        {
+          "error": "network"
+        }
+      ]
+    },
+    {
+      "name": "at expiresAt + 120: none may still be paid (step 2)",
+      "now": 1791379300,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [],
+        "checked": [],
+        "outcome": null
+      }
+    },
+    {
+      "name": "an invoice past its end and a later one: the later checked, then handed out",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791376280,
+          "expiresAt": 1791377180,
+          "declaredAt": 1791376283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        }
+      ],
+      "records": [],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791376280,
+            "declaredAt": 1791376283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          }
+        ],
+        "mayBePaid": [1],
+        "checked": [1],
+        "outcome": {
+          "handOut": 1
+        }
+      },
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "name": "two may still be paid, the newer's declaration on a majority, the older's on one relay: the newer",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 1
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, the older's declaration on a majority, the newer's on one relay: the older",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, the older paid: order_paid",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "paid"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "orderPaid": 0
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, both paid: order_paid, the first",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "paid"
+        },
+        {
+          "state": "paid"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "orderPaid": 0
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, the older's check fails, the newer paid: order_paid",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "error": "network"
+        },
+        {
+          "state": "paid"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "orderPaid": 1
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, one check fails, none paid: its error, whatever the relays sent",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "error": "network"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "error": "network"
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, the older paid, fewer than a majority answer the read again: order_paid all the same",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "paid"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "orderPaid": 0
+        }
+      },
+      "readFails": true
+    },
+    {
+      "name": "two may still be paid, both open, fewer than a majority answer the read again: network",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "error": "network"
+        }
+      },
+      "readFails": true
+    },
+    {
+      "name": "two may still be paid, one check fails, fewer than a majority answer the read again: the check's error",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "error": "invalid_invoice"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "error": "invalid_invoice"
+        }
+      },
+      "readFails": true
+    },
+    {
+      "name": "of 3 relays, 2 are a majority: the older, which 2 sent, the newer 1",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 2
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "of 4 relays, 2 are no majority: the older, which 3 sent, the newer 2",
+      "relays": 4,
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 3
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 2
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "of 4 relays, 2 each: no one decides, the newest",
+      "relays": 4,
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 2
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 2
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, both on a majority (no one decides), both open: the newest",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "two may still be paid, neither on a majority (a relay mute), both open: the newest",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 1
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "no one decides, the older unconfirmed, the newer open: the older",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "unconfirmed"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "no one decides, the older open with something received, the newer open: the older",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283,
+          "sentBy": 1
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343,
+          "sentBy": 1
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "open",
+          "received": "30000"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "three may still be paid, no one decides, two unconfirmed: the newest unconfirmed",
+      "now": 1791378380,
+      "declarations": [
+        {
+          "invoice": "lnbc490u1p111111111111",
+          "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "declaredAt": 1791378283
+        },
+        {
+          "invoice": "lnbc490u1p222222222222",
+          "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "declaredAt": 1791378343
+        },
+        {
+          "invoice": "lnbc490u1p333333333333",
+          "paymentHash": "3333333333333333333333333333333333333333333333333333333333333333",
+          "createdAt": 1791378370,
+          "expiresAt": 1791379270,
+          "declaredAt": 1791378373
+        }
+      ],
+      "records": [],
+      "statuses": [
+        {
+          "state": "unconfirmed"
+        },
+        {
+          "state": "unconfirmed"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": "1111111111111111111111111111111111111111111111111111111111111111",
+            "onchainAddress": null,
+            "createdAt": 1791378280,
+            "declaredAt": 1791378283
+          },
+          {
+            "paymentHash": "2222222222222222222222222222222222222222222222222222222222222222",
+            "onchainAddress": null,
+            "createdAt": 1791378340,
+            "declaredAt": 1791378343
+          },
+          {
+            "paymentHash": "3333333333333333333333333333333333333333333333333333333333333333",
+            "onchainAddress": null,
+            "createdAt": 1791378370,
+            "declaredAt": 1791378373
+          }
+        ],
+        "mayBePaid": [0, 1, 2],
+        "checked": [0, 1, 2],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "a failed call's mark on one relay, then an invoice shown and paid: order_paid, the one shown",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378280,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          },
+          "sentBy": 1
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378341,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378342,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "paid"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378282
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378340,
+            "declaredAt": 1791378342
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "orderPaid": 1
+        }
+      }
+    },
+    {
+      "name": "a failed call's mark on one relay, then an invoice shown, not paid yet: the one shown",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378280,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378280,
+          "expiresAt": 1791379180,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378282,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          },
+          "sentBy": 1
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378341,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378342,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378280,
+            "declaredAt": 1791378282
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378340,
+            "declaredAt": 1791378342
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 1
+        }
+      }
+    },
+    {
+      "name": "the same, both of one second, the one never shown sorting last: the one shown",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378340,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378342,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          },
+          "sentBy": 1
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378341,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378342,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378340,
+            "declaredAt": 1791378342
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378340,
+            "declaredAt": 1791378342
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    },
+    {
+      "name": "the same, the failed call's server's clock 3 s ahead: the one shown",
+      "now": 1791378380,
+      "declarations": [],
+      "records": [
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378343,
+          "expiresAt": 1791379243,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378343,
+            "id": "01010101010101010101010101010101010101010101010101010101010101ee"
+          }
+        },
+        {
+          "address": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+          "invoice": null,
+          "createdAt": 1791378343,
+          "expiresAt": 1791379243,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378345,
+            "id": "02020202020202020202020202020202020202020202020202020202020202ee"
+          },
+          "sentBy": 1
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": false,
+          "event": {
+            "createdAt": 1791378341,
+            "id": "03030303030303030303030303030303030303030303030303030303030303ee"
+          }
+        },
+        {
+          "address": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+          "invoice": null,
+          "createdAt": 1791378340,
+          "expiresAt": 1791379240,
+          "confirmed": true,
+          "event": {
+            "createdAt": 1791378342,
+            "id": "04040404040404040404040404040404040404040404040404040404040404ee"
+          }
+        }
+      ],
+      "statuses": [
+        {
+          "state": "open"
+        },
+        {
+          "state": "open"
+        }
+      ],
+      "expected": {
+        "invoices": [
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+            "createdAt": 1791378340,
+            "declaredAt": 1791378342
+          },
+          {
+            "paymentHash": null,
+            "onchainAddress": "bc1px22v5j99gdwhxqyelg2p6tdcfajjd3njhzn22c2gura2dvxg2xlqw2wte4",
+            "createdAt": 1791378343,
+            "declaredAt": 1791378345
+          }
+        ],
+        "mayBePaid": [0, 1],
+        "checked": [0, 1],
+        "outcome": {
+          "handOut": 0
+        }
+      }
+    }
+  ]
+}

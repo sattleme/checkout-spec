@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/conversions.schema.json",
+  "title": "vectors/conversions.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fiat": {
+            "$ref": "common.schema.json#/$defs/fiatInput"
+          },
+          "price": {
+            "type": "string"
+          },
+          "sats": {
+            "$ref": "common.schema.json#/$defs/digits"
+          }
+        },
+        "required": ["fiat", "price", "sats"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

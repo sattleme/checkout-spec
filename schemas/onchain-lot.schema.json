@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/onchain-lot.schema.json",
+  "title": "vectors/app/onchain-lot.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "secretKey": {
+      "type": "string",
+      "pattern": "^sattleme_ck_"
+    },
+    "team": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "lotAddress": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "channelEncryptionKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "lot": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "$ref": "common.schema.json#/$defs/event"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "t": {
+              "const": "integration-onchain-lot"
+            },
+            "v": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "const": 1
+                },
+                "addresses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.schema.json#/$defs/depositAddress"
+                  },
+                  "maxItems": 100,
+                  "uniqueItems": true
+                },
+                "updatedAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                }
+              },
+              "required": ["version", "addresses", "updatedAt"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["t", "v"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["event", "value"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["source", "secretKey", "team", "lotAddress", "channelEncryptionKey", "lot"],
+  "additionalProperties": false
+}

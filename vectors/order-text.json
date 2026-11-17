@@ -1,0 +1,175 @@
+{
+  "description": "An order's reference and note (SPEC.md §17, Creating an invoice). `refs`: whether each reference is valid. `notes`: the label the declaration and the invoice's comment carry (null: no note given), or the error. `comments`: whether the label is sent as the LNURL comment, given the service's commentAllowed.",
+  "refs": [
+    {
+      "ref": "ORD-1042",
+      "valid": true
+    },
+    {
+      "ref": "a.b_c:d-e",
+      "valid": true
+    },
+    {
+      "ref": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": true
+    },
+    {
+      "ref": "",
+      "valid": false
+    },
+    {
+      "ref": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "valid": false
+    },
+    {
+      "ref": "ORD 1042",
+      "valid": false
+    },
+    {
+      "ref": "ORD/1042",
+      "valid": false
+    },
+    {
+      "ref": "ORD-1042€",
+      "valid": false
+    }
+  ],
+  "notes": [
+    {
+      "ref": "ORD-1",
+      "note": null,
+      "expected": {
+        "label": "ORD-1"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "",
+      "expected": {
+        "label": "ORD-1"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "   ",
+      "expected": {
+        "label": "ORD-1"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "  Order 1042  ",
+      "expected": {
+        "label": "Order 1042"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": " Order ",
+      "expected": {
+        "label": " Order "
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+      "expected": {
+        "label": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+      "expected": {
+        "label": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "Order \ud800",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "😀 Order",
+      "expected": {
+        "label": "😀 Order"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "a\nb",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "\tOrder",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    },
+    {
+      "ref": "ORD-1",
+      "note": "Order",
+      "expected": {
+        "error": "invalid_order",
+        "param": "note"
+      }
+    }
+  ],
+  "comments": [
+    {
+      "label": "Order 1042",
+      "commentAllowed": 255,
+      "sent": true
+    },
+    {
+      "label": "Order 1042",
+      "commentAllowed": 10,
+      "sent": true
+    },
+    {
+      "label": "Order 1042",
+      "commentAllowed": 9,
+      "sent": false
+    },
+    {
+      "label": "éé",
+      "commentAllowed": 4,
+      "sent": true
+    },
+    {
+      "label": "éé",
+      "commentAllowed": 3,
+      "sent": false
+    },
+    {
+      "label": "ORD-1",
+      "commentAllowed": 0,
+      "sent": false
+    }
+  ]
+}

@@ -1,0 +1,552 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/onchain-payments.schema.json",
+  "title": "vectors/onchain-payments.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "invoice": {
+      "type": "object",
+      "properties": {
+        "onchainAddress": {
+          "$ref": "common.schema.json#/$defs/depositAddress"
+        },
+        "sats": {
+          "$ref": "common.schema.json#/$defs/digits"
+        },
+        "expiresAt": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        }
+      },
+      "required": ["onchainAddress", "sats", "expiresAt"],
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "now": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "tolerance": {
+            "type": "integer"
+          },
+          "accepted": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "acceptance": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "merchantAccepted": {
+            "oneOf": [
+              {
+                "const": "unreadable"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "received": {
+                          "$ref": "common.schema.json#/$defs/digits",
+                          "description": "The record's `received`, a string of digits here; the record holds it as a JSON number (SPEC.md \u00a731)."
+                        },
+                        "createdAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        },
+                        "id": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sentBy": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 3
+                        }
+                      },
+                      "required": ["received", "createdAt"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "newer": {
+                          "const": true
+                        },
+                        "createdAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        },
+                        "id": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sentBy": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 3
+                        }
+                      },
+                      "required": ["newer", "createdAt"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "lightning": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "common.schema.json#/$defs/error"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "enum": ["open", "expired"]
+                  }
+                },
+                "required": ["state"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "const": "paid"
+                  },
+                  "preimage": {
+                    "$ref": "common.schema.json#/$defs/hex32"
+                  }
+                },
+                "required": ["state", "preimage"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "explorer": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "const": true
+                  }
+                },
+                "required": ["error"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "height": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "txs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "txid": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "vout": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "scriptpubkey_address": {
+                                "type": ["string", "null"]
+                              },
+                              "scriptpubkey": {
+                                "type": "string"
+                              },
+                              "scriptpubkey_type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["value"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "status": {
+                          "type": "object",
+                          "properties": {
+                            "confirmed": {
+                              "type": "boolean"
+                            },
+                            "block_height": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": ["confirmed"],
+                          "additionalProperties": false
+                        },
+                        "vin": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "is_coinbase": {
+                                    "const": true
+                                  }
+                                },
+                                "required": ["is_coinbase"],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "txid": {
+                                    "$ref": "common.schema.json#/$defs/hex32"
+                                  },
+                                  "vout": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 4294967295
+                                  },
+                                  "is_coinbase": {
+                                    "const": false
+                                  }
+                                },
+                                "required": ["txid", "vout"],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "required": ["txid", "vin", "vout", "status"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["height", "txs"],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "expected": {
+            "$ref": "common.schema.json#/$defs/paymentStatus"
+          },
+          "witnesses": {
+            "oneOf": [
+              {
+                "const": "unreadable"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txid": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sale": {
+                          "enum": ["newer", "newer none"]
+                        },
+                        "address": {
+                          "const": "other"
+                        }
+                      },
+                      "required": ["txid", "sale"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txid": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sale": {
+                          "enum": ["this", null, "other"]
+                        },
+                        "address": {
+                          "const": "other"
+                        },
+                        "sats": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 2100000000000000
+                        },
+                        "inputs": {
+                          "type": "array",
+                          "maxItems": 100,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "common.schema.json#/$defs/coin"
+                          }
+                        },
+                        "replacement": {
+                          "type": "boolean"
+                        },
+                        "seenAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        },
+                        "expiresAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        }
+                      },
+                      "required": ["txid", "sale", "sats", "inputs", "replacement", "seenAt"],
+                      "if": {
+                        "properties": {
+                          "sale": {
+                            "const": "this"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "expiresAt": {
+                            "$ref": "common.schema.json#/$defs/unixSeconds"
+                          }
+                        },
+                        "required": ["expiresAt"]
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "published": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "txid": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "sale": {
+                  "enum": ["this", null]
+                },
+                "replacement": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["txid", "sale", "replacement"],
+              "additionalProperties": false
+            }
+          },
+          "blockcypher": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "error": {
+                    "const": true
+                  }
+                },
+                "required": ["error"],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "propertyNames": {
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "asked": {
+            "type": "array",
+            "items": {
+              "$ref": "common.schema.json#/$defs/hex32"
+            }
+          },
+          "publishFails": {
+            "type": "boolean"
+          },
+          "rests": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "invoice": {
+                  "type": "string",
+                  "pattern": "^lnbc"
+                },
+                "paymentHash": {
+                  "$ref": "common.schema.json#/$defs/hex32"
+                },
+                "sats": {
+                  "$ref": "common.schema.json#/$defs/digits"
+                },
+                "createdAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "expiresAt": {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                "lightning": {
+                  "oneOf": [
+                    {
+                      "$ref": "common.schema.json#/$defs/error"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": ["open", "expired"]
+                        }
+                      },
+                      "required": ["state"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "const": "paid"
+                        },
+                        "preimage": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        }
+                      },
+                      "required": ["state", "preimage"],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "required": ["invoice", "paymentHash", "sats", "createdAt", "expiresAt", "lightning"],
+              "additionalProperties": false
+            }
+          },
+          "witnessesAgain": {
+            "oneOf": [
+              {
+                "const": "unreadable"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txid": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sale": {
+                          "enum": ["newer", "newer none"]
+                        },
+                        "address": {
+                          "const": "other"
+                        }
+                      },
+                      "required": ["txid", "sale"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "txid": {
+                          "$ref": "common.schema.json#/$defs/hex32"
+                        },
+                        "sale": {
+                          "enum": ["this", null, "other"]
+                        },
+                        "address": {
+                          "const": "other"
+                        },
+                        "sats": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 2100000000000000
+                        },
+                        "inputs": {
+                          "type": "array",
+                          "maxItems": 100,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "common.schema.json#/$defs/coin"
+                          }
+                        },
+                        "replacement": {
+                          "type": "boolean"
+                        },
+                        "seenAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        },
+                        "expiresAt": {
+                          "$ref": "common.schema.json#/$defs/unixSeconds"
+                        }
+                      },
+                      "required": ["txid", "sale", "sats", "inputs", "replacement", "seenAt"],
+                      "if": {
+                        "properties": {
+                          "sale": {
+                            "const": "this"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "expiresAt": {
+                            "$ref": "common.schema.json#/$defs/unixSeconds"
+                          }
+                        },
+                        "required": ["expiresAt"]
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "now",
+          "lightning",
+          "explorer",
+          "witnesses",
+          "publishFails",
+          "expected",
+          "published",
+          "blockcypher",
+          "asked"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "invoice", "cases"],
+  "additionalProperties": false
+}

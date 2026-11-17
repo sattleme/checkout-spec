@@ -1,0 +1,151 @@
+{
+  "description": "Prices of one bitcoin (SPEC.md §25, Prices in a currency). `text`: a price a source wrote as a string, as its exact decimal (plain, shortest), or null when refused. `numbers`: a price a source wrote as a JSON number (the literal), read as an IEEE 754 double, then as the shortest decimal that reads back as that double.",
+  "text": [
+    {
+      "price": "69012",
+      "expected": "69012"
+    },
+    {
+      "price": "69012.50",
+      "expected": "69012.5"
+    },
+    {
+      "price": "69025.1084416666694295",
+      "expected": "69025.1084416666694295"
+    },
+    {
+      "price": "6.9012e4",
+      "expected": "69012"
+    },
+    {
+      "price": "8e-8",
+      "expected": "0.00000008"
+    },
+    {
+      "price": "1E+3",
+      "expected": "1000"
+    },
+    {
+      "price": "00069012",
+      "expected": "69012"
+    },
+    {
+      "price": "",
+      "expected": null
+    },
+    {
+      "price": " 69012",
+      "expected": null
+    },
+    {
+      "price": "69012 ",
+      "expected": null
+    },
+    {
+      "price": "-69012",
+      "expected": null
+    },
+    {
+      "price": "+69012",
+      "expected": null
+    },
+    {
+      "price": "0",
+      "expected": null
+    },
+    {
+      "price": "0.000",
+      "expected": null
+    },
+    {
+      "price": "1,5",
+      "expected": null
+    },
+    {
+      "price": ".5",
+      "expected": null
+    },
+    {
+      "price": "5.",
+      "expected": null
+    },
+    {
+      "price": "0x10",
+      "expected": null
+    },
+    {
+      "price": "Infinity",
+      "expected": null
+    },
+    {
+      "price": "NaN",
+      "expected": null
+    },
+    {
+      "price": "1e",
+      "expected": null
+    },
+    {
+      "price": "1e64",
+      "expected": "10000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "price": "1e65",
+      "expected": null
+    },
+    {
+      "price": "1e-65",
+      "expected": null
+    },
+    {
+      "price": "1111111111111111111111111111111111111111111111111111111111111111",
+      "expected": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "price": "11111111111111111111111111111111111111111111111111111111111111111",
+      "expected": null
+    }
+  ],
+  "numbers": [
+    {
+      "json": "69012",
+      "expected": "69012"
+    },
+    {
+      "json": "69012.5",
+      "expected": "69012.5"
+    },
+    {
+      "json": "69012.0",
+      "expected": "69012"
+    },
+    {
+      "json": "0.30000000000000004",
+      "expected": "0.30000000000000004"
+    },
+    {
+      "json": "1e-7",
+      "expected": "0.0000001"
+    },
+    {
+      "json": "69025.1084416666694295",
+      "expected": "69025.10844166667"
+    },
+    {
+      "json": "1.5e21",
+      "expected": "1500000000000000000000"
+    },
+    {
+      "json": "1660867710597813.25",
+      "expected": "1660867710597813.2"
+    },
+    {
+      "json": "0",
+      "expected": null
+    },
+    {
+      "json": "-5",
+      "expected": null
+    }
+  ]
+}

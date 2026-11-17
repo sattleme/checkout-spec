@@ -1,0 +1,199 @@
+{
+  "description": "The methods of an order (SPEC.md §31, Methods by amount), for an order in sats: its `sats`, the Lightning address's sendable sats (`sendable`: ceil(minSendable / 1000) to floor(maxSendable / 1000)), and what leasing an address gives when the amount allows on-chain (`address`: \"leased\", an address was leased; \"none\", none could be; \"explorer_failed\", the explorer failed). `address` plays no part below 1 000 sats. `expected`: the methods, in this order, or the error.",
+  "cases": [
+    {
+      "name": "1 sat",
+      "sats": "1",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning"]
+      }
+    },
+    {
+      "name": "999 sats",
+      "sats": "999",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning"]
+      }
+    },
+    {
+      "name": "999 sats, outside the sendable sats",
+      "sats": "999",
+      "sendable": {
+        "min": "1000",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "error": "invalid_order",
+        "param": "sats"
+      }
+    },
+    {
+      "name": "1 000 sats",
+      "sats": "1000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning", "onchain"]
+      }
+    },
+    {
+      "name": "1 000 sats, no address",
+      "sats": "1000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "none",
+      "expected": {
+        "methods": ["lightning"]
+      }
+    },
+    {
+      "name": "1 000 sats, the explorer failed",
+      "sats": "1000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "explorer_failed",
+      "expected": {
+        "methods": ["lightning"]
+      }
+    },
+    {
+      "name": "49 000 sats",
+      "sats": "49000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning", "onchain"]
+      }
+    },
+    {
+      "name": "the Lightning address's maximum",
+      "sats": "4000000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning", "onchain"]
+      }
+    },
+    {
+      "name": "above the Lightning address's maximum",
+      "sats": "4000001",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["onchain"]
+      }
+    },
+    {
+      "name": "above the Lightning address's maximum, no address",
+      "sats": "4000001",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "none",
+      "expected": {
+        "error": "onchain_unavailable"
+      }
+    },
+    {
+      "name": "above the Lightning address's maximum, the explorer failed",
+      "sats": "4000001",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "explorer_failed",
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "below the Lightning address's minimum, on-chain allowed",
+      "sats": "1500",
+      "sendable": {
+        "min": "2000",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["onchain"]
+      }
+    },
+    {
+      "name": "2 BTC, within the sendable sats",
+      "sats": "200000000",
+      "sendable": {
+        "min": "1",
+        "max": "500000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["lightning", "onchain"]
+      }
+    },
+    {
+      "name": "2 BTC, within the sendable sats, no address",
+      "sats": "200000000",
+      "sendable": {
+        "min": "1",
+        "max": "500000000"
+      },
+      "address": "none",
+      "expected": {
+        "methods": ["lightning"]
+      }
+    },
+    {
+      "name": "21 000 000 BTC",
+      "sats": "2100000000000000",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "methods": ["onchain"]
+      }
+    },
+    {
+      "name": "above 21 000 000 BTC",
+      "sats": "2100000000000001",
+      "sendable": {
+        "min": "1",
+        "max": "4000000"
+      },
+      "address": "leased",
+      "expected": {
+        "error": "invalid_order",
+        "param": "sats"
+      }
+    }
+  ]
+}

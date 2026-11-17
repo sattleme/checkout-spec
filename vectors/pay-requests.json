@@ -1,0 +1,810 @@
+{
+  "description": "The pay request of a Lightning address (SPEC.md §16, The pay request), as the GET of its pay URL answers it (`http`: its status, and its body as a JSON value, `body`, or as sent, `bodyText`, read as SPEC.md §2 and §15 say). `expected`: what the pay request gives, its `callback`, its sendable sats (SPEC.md §16, Sendable sats: `min` and `max`), its `commentAllowed` and the description hash of its invoices (hex SHA-256 of the UTF-8 of `metadata`); or the error.",
+  "cases": [
+    {
+      "name": "breez.tips's pay request",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "metadata of non-ASCII characters: the hash of its UTF-8",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"zoe@breez.tips\"],[\"text/plain\",\"Payer à la Crêperie Zoé, Genève ☕ 😀\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "d8709005251156ba5fe2f053947af5d3b719dceec1a1bced9e79bdbe47fec755"
+      }
+    },
+    {
+      "name": "metadata written with JSON escapes: the hash of the text they make",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/plain\\\",\\\"Pay to Caf\\u00e9 \\ud83d\\ude00\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "85b56de92c66840f7e3ebdc1668e894ebbf74ac908689096d66675e4b57c643d"
+      }
+    },
+    {
+      "name": "an escape of the metadata's own JSON: hashed as written, never decoded",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/plain\",\"Pay \\u00e9\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "6fd102a8fdce6d38ba451fa5f0fb83c8ec3ba13ba2bb2754a691c9d47f6d76ec"
+      }
+    },
+    {
+      "name": "sendable sats rounded inwards",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1001,
+          "maxSendable": 1999999,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "2",
+          "max": "1999"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "one sat exactly",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 1000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "1"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "no whole sat within the bounds: valid, no amount sendable",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1,
+          "maxSendable": 999,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "0"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "minSendable 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 0,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "0",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "bounds written 1000.0 and 1e11: their values",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000.0,\"maxSendable\":1e11,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "maxSendable 2^53 - 1, the largest safe integer",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 9007199254740991,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "9007199254740"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed absent: 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]"
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 0
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed negative: 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": -5
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed not an integer: 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 1.5
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed a string: 0",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": "255"
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed 2^53, not a safe integer: 0",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":9007199254740992}"
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 0,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "commentAllowed written 255.0: 255",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":255.0}"
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "members of other names, an OK status among them: ignored",
+      "http": {
+        "status": 200,
+        "body": {
+          "status": "OK",
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255,
+          "allowsNostr": true,
+          "nostrPubkey": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+          "payerData": {
+            "name": {
+              "mandatory": false
+            }
+          }
+        }
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "a byte order mark before the body: ignored",
+      "http": {
+        "status": 200,
+        "bodyText": "﻿{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "callback": "https://breez.tips/lnurlp/shop/invoice",
+        "sendable": {
+          "min": "1",
+          "max": "100000000"
+        },
+        "commentAllowed": 255,
+        "descriptionHash": "049e1c5759f817757d6487545b2419f4692739b51821508f8abe536f9d71c277"
+      }
+    },
+    {
+      "name": "no tag",
+      "http": {
+        "status": 200,
+        "body": {
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "another tag",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "withdrawRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "the tag in other letters: another tag",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payrequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "no callback",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "a callback not a string",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": 42,
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "a callback in http",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "http://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "a callback on an IP address",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://10.0.0.1/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "a callback on a host of one label",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://intranet/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "no minSendable",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "minSendable negative",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": -1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "minSendable not an integer",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000.5,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "minSendable a string",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": "1000",
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "maxSendable 2^53, not a safe integer",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":9007199254740992,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "maxSendable 1e400, not a safe integer",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":1e400,\"metadata\":\"[[\\\"text/identifier\\\",\\\"shop@breez.tips\\\"],[\\\"text/plain\\\",\\\"Pay to Sunrise Bakery\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "minSendable above maxSendable",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 2000,
+          "maxSendable": 1999,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "no metadata",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "metadata not a string",
+      "http": {
+        "status": 200,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": [["text/plain", "Pay to Sunrise Bakery"]],
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "metadata holding a lone high surrogate: no UTF-8 to hash",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/plain\\\",\\\"Pay \\ud800\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "metadata holding a lone low surrogate: no UTF-8 to hash",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/plain\\\",\\\"Pay \\udfff\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "metadata holding a surrogate pair reversed: two lone surrogates",
+      "http": {
+        "status": 200,
+        "bodyText": "{\"tag\":\"payRequest\",\"callback\":\"https://breez.tips/lnurlp/shop/invoice\",\"minSendable\":1000,\"maxSendable\":100000000000,\"metadata\":\"[[\\\"text/plain\\\",\\\"Pay \\ude00\\ud83d\\\"]]\",\"commentAllowed\":255}"
+      },
+      "expected": {
+        "error": "invalid_invoice"
+      }
+    },
+    {
+      "name": "a refusal (status ERROR) with HTTP 200",
+      "http": {
+        "status": 200,
+        "body": {
+          "status": "ERROR",
+          "reason": "Unknown user"
+        }
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "a refusal in lower case",
+      "http": {
+        "status": 200,
+        "body": {
+          "status": "error",
+          "reason": "Unknown user"
+        }
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "a refusal with HTTP 404",
+      "http": {
+        "status": 404,
+        "body": {
+          "status": "ERROR",
+          "reason": "Not found"
+        }
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "a pay request with HTTP 500: no answer",
+      "http": {
+        "status": 500,
+        "body": {
+          "tag": "payRequest",
+          "callback": "https://breez.tips/lnurlp/shop/invoice",
+          "minSendable": 1000,
+          "maxSendable": 100000000000,
+          "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+          "commentAllowed": 255
+        }
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "a redirect: no answer",
+      "http": {
+        "status": 302,
+        "bodyText": ""
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "not JSON",
+      "http": {
+        "status": 200,
+        "bodyText": "<html>"
+      },
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "name": "a JSON array, not an object",
+      "http": {
+        "status": 200,
+        "body": [
+          {
+            "tag": "payRequest",
+            "callback": "https://breez.tips/lnurlp/shop/invoice",
+            "minSendable": 1000,
+            "maxSendable": 100000000000,
+            "metadata": "[[\"text/identifier\",\"shop@breez.tips\"],[\"text/plain\",\"Pay to Sunrise Bakery\"]]",
+            "commentAllowed": 255
+          }
+        ]
+      },
+      "expected": {
+        "error": "network"
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/checkout-link.schema.json",
+  "title": "vectors/app/checkout-link.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "order": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "fiat": {
+          "$ref": "common.schema.json#/$defs/fiatInput"
+        },
+        "note": {
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "integer"
+        },
+        "checkout": {
+          "const": true
+        },
+        "redirectUrl": {
+          "type": "string"
+        }
+      },
+      "required": ["ref", "fiat", "note", "durationSeconds", "checkout", "redirectUrl"],
+      "additionalProperties": false
+    },
+    "payRequest": {
+      "$ref": "common.schema.json#/$defs/payRequest"
+    },
+    "price": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?$"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "relays": {
+      "$ref": "common.schema.json#/$defs/relays"
+    },
+    "businessName": {
+      "type": "string"
+    },
+    "invoice": {
+      "type": "string"
+    },
+    "verifyUrl": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "paymentHash": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "sats": {
+      "$ref": "common.schema.json#/$defs/digits"
+    },
+    "expiresAt": {
+      "$ref": "common.schema.json#/$defs/unixSeconds"
+    },
+    "linkKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "author": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "address": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "encryptionKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "value": {
+      "$ref": "common.schema.json#/$defs/checkoutValue"
+    },
+    "event": {
+      "$ref": "common.schema.json#/$defs/event"
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https://"
+    }
+  },
+  "required": [
+    "source",
+    "order",
+    "payRequest",
+    "price",
+    "origin",
+    "relays",
+    "businessName",
+    "invoice",
+    "verifyUrl",
+    "paymentHash",
+    "sats",
+    "expiresAt",
+    "linkKey",
+    "author",
+    "address",
+    "encryptionKey",
+    "value",
+    "event",
+    "url"
+  ],
+  "additionalProperties": false
+}

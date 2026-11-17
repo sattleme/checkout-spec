@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/payment-methods.schema.json",
+  "title": "vectors/payment-methods.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sats": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "sendable": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "$ref": "common.schema.json#/$defs/digits"
+              },
+              "max": {
+                "$ref": "common.schema.json#/$defs/digits"
+              }
+            },
+            "required": ["min", "max"],
+            "additionalProperties": false
+          },
+          "address": {
+            "enum": ["leased", "none", "explorer_failed"]
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "methods": {
+                    "type": "array",
+                    "items": {
+                      "enum": ["lightning", "onchain"]
+                    },
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "uniqueItems": true
+                  }
+                },
+                "required": ["methods"],
+                "additionalProperties": false
+              },
+              {
+                "$ref": "common.schema.json#/$defs/error"
+              }
+            ]
+          }
+        },
+        "required": ["name", "sats", "sendable", "address", "expected"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

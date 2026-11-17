@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/bitcoin-nodes.schema.json",
+  "title": "vectors/bitcoin-nodes.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "urls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "rest": {
+                    "type": "string",
+                    "pattern": "^https?://.*/api$"
+                  },
+                  "webSocket": {
+                    "type": "string",
+                    "pattern": "^wss?://.*/api/v1/ws$"
+                  }
+                },
+                "required": ["rest", "webSocket"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name", "url", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "description": "The channel's `bitcoinNode` as written, any JSON value; absent: the field is absent."
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/channelNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "reads": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "node": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "fallback": {
+                    "enum": ["mempool", "none"]
+                  },
+                  "failedRecently": {
+                    "type": "boolean"
+                  },
+                  "answers": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["fallback", "failedRecently", "answers"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mempoolAnswers": {
+            "type": "boolean"
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "asked": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "enum": ["node", "mempool"]
+                }
+              },
+              "result": {
+                "enum": ["node", "mempool", "network"]
+              }
+            },
+            "required": ["asked", "result"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "node", "mempoolAnswers", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "object",
+            "description": "A checkout link's record value, opened (SPEC.md \u00a730); valid in every case."
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/recordNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name", "value", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "writes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "channel": {
+            "description": "The channel's `bitcoinNode` as written, any JSON value; absent: the field is absent."
+          },
+          "address": {
+            "type": "boolean"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/recordNode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["name", "address", "expected"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "urls", "channels", "reads", "records", "writes"],
+  "additionalProperties": false,
+  "$defs": {
+    "channelNode": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "fallback": {
+          "enum": ["mempool", "none"]
+        },
+        "payers": {
+          "type": "boolean"
+        }
+      },
+      "required": ["url", "fallback", "payers"],
+      "additionalProperties": false
+    },
+    "recordNode": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^https://",
+          "maxLength": 200
+        },
+        "fallback": {
+          "enum": ["mempool", "none"]
+        }
+      },
+      "required": ["url", "fallback"],
+      "additionalProperties": false
+    }
+  }
+}

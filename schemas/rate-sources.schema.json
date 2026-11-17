@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/rate-sources.schema.json",
+  "title": "vectors/rate-sources.json",
+  "type": "object",
+  "$defs": {
+    "name": {
+      "enum": ["coingecko", "mempool", "opennode", "coinbase", "kraken"]
+    },
+    "names": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/name"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "answer": {
+      "oneOf": [
+        {
+          "enum": ["network", "rate", "unsupported_currency"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "string"
+            },
+            "time": {
+              "oneOf": [
+                {
+                  "$ref": "common.schema.json#/$defs/unixSeconds"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["price", "time"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "statuses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 999
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "enum": ["network", "rate"]
+              }
+            },
+            "required": ["error"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["status", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "default": {
+      "$ref": "#/$defs/names"
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rateSource": true,
+          "expected": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "sources": {
+                    "$ref": "#/$defs/names"
+                  }
+                },
+                "required": ["sources"],
+                "additionalProperties": false
+              },
+              {
+                "$ref": "common.schema.json#/$defs/error"
+              }
+            ]
+          }
+        },
+        "required": ["name", "expected"],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "lists": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "common.schema.json#/$defs/currency"
+        },
+        "now": {
+          "$ref": "common.schema.json#/$defs/unixSeconds"
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sources": {
+                "$ref": "#/$defs/names"
+              },
+              "answers": {
+                "type": "object",
+                "propertyNames": {
+                  "$ref": "#/$defs/name"
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/answer"
+                },
+                "minProperties": 1
+              },
+              "expected": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "price": {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]*[1-9])?$"
+                      },
+                      "asked": {
+                        "$ref": "#/$defs/names"
+                      }
+                    },
+                    "required": ["source", "price", "asked"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "enum": ["network", "rate", "unsupported_currency"]
+                      },
+                      "asked": {
+                        "$ref": "#/$defs/names"
+                      }
+                    },
+                    "required": ["error", "asked"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["name", "sources", "answers", "expected"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["currency", "now", "cases"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["description", "statuses", "default", "values", "lists"],
+  "additionalProperties": false
+}

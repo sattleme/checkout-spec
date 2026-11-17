@@ -1,0 +1,1548 @@
+{
+  "description": "The merchant's Bitcoin node (SPEC.md §31, The merchant's Bitcoin node; SPEC.md §30, The record). `urls`: each text (`url`) and, when it is a node URL, where the node is read (`expected`: `rest`, the `<explorer>` of SPEC.md §31 Explorers, and `webSocket`), else null. `channels`: the channel's `bitcoinNode` as written (`value`; absent: the field is absent) and the node it gives (`expected`: its `url`, `fallback` and `payers`), or null when there is none (the server reads mempool.space), the channel valid either way. `reads`: one read of the explorer (a REST read; the two reads of a check's step 1, an address's transactions and the chain's height, which are one read and fail when either fails; or a WebSocket's connection, which fails when it fails or is lost before any message): the node (`node`: its `fallback`, whether it failed a read less than 60 s ago in the same call (`failedRecently`) and whether it answers this read (`answers`); null: none), whether mempool.space answers it (`mempoolAnswers`); `expected`: the explorers asked, in order (`asked`), and whose answer the read gives (`result`: `node`, `mempool`, or `network` when it fails); it holds for a checkout link's page too, with the node of the link's record. A node that failed less than 60 s ago is asked after mempool.space as a server SHOULD ask it (SPEC.md §31): a port that does not follow that advice checks only the cases whose `failedRecently` is false. `records`: a checkout link's record value, opened, valid in every case (SPEC.md §30, Reading a record: the cases of `records` of checkout-links.json with a `bitcoinNode` added), and the node its page reads (`expected`: its `url` and `fallback`), or null for mempool.space (no `bitcoinNode`, one set aside, or a record of version 1, which ignores it). `writes`: the channel's `bitcoinNode` that `createInvoice` read (`channel`; absent: the field is absent) and whether the order has an address (`address`: a record of version 2, else of version 1), and the `bitcoinNode` its checkout link's record holds (`expected`), or null when the record has none (the field absent).",
+  "urls": [
+    {
+      "name": "an Umbrel node on the merchant's network",
+      "url": "http://192.168.1.10:3006",
+      "expected": {
+        "rest": "http://192.168.1.10:3006/api",
+        "webSocket": "ws://192.168.1.10:3006/api/v1/ws"
+      }
+    },
+    {
+      "name": "an mDNS name",
+      "url": "http://umbrel.local",
+      "expected": {
+        "rest": "http://umbrel.local/api",
+        "webSocket": "ws://umbrel.local/api/v1/ws"
+      }
+    },
+    {
+      "name": "a Tailscale address",
+      "url": "http://100.64.0.1",
+      "expected": {
+        "rest": "http://100.64.0.1/api",
+        "webSocket": "ws://100.64.0.1/api/v1/ws"
+      }
+    },
+    {
+      "name": "https with a path",
+      "url": "https://node.example/mempool",
+      "expected": {
+        "rest": "https://node.example/mempool/api",
+        "webSocket": "wss://node.example/mempool/api/v1/ws"
+      }
+    },
+    {
+      "name": "https to a public IPv4 address",
+      "url": "https://8.8.8.8",
+      "expected": {
+        "rest": "https://8.8.8.8/api",
+        "webSocket": "wss://8.8.8.8/api/v1/ws"
+      }
+    },
+    {
+      "name": "https to a local name",
+      "url": "https://umbrel.local:3006",
+      "expected": {
+        "rest": "https://umbrel.local:3006/api",
+        "webSocket": "wss://umbrel.local:3006/api/v1/ws"
+      }
+    },
+    {
+      "name": "port 65535",
+      "url": "https://node.example:65535",
+      "expected": {
+        "rest": "https://node.example:65535/api",
+        "webSocket": "wss://node.example:65535/api/v1/ws"
+      }
+    },
+    {
+      "name": "port 1",
+      "url": "https://node.example:1",
+      "expected": {
+        "rest": "https://node.example:1/api",
+        "webSocket": "wss://node.example:1/api/v1/ws"
+      }
+    },
+    {
+      "name": "a label of 63 characters",
+      "url": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example",
+      "expected": {
+        "rest": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example/api",
+        "webSocket": "wss://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example/api/v1/ws"
+      }
+    },
+    {
+      "name": "200 characters",
+      "url": "https://node.example/ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "expected": {
+        "rest": "https://node.example/ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp/api",
+        "webSocket": "wss://node.example/ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp/api/v1/ws"
+      }
+    },
+    {
+      "name": "the lowest of 10.0.0.0/8",
+      "url": "http://10.0.0.0",
+      "expected": {
+        "rest": "http://10.0.0.0/api",
+        "webSocket": "ws://10.0.0.0/api/v1/ws"
+      }
+    },
+    {
+      "name": "the highest of 10.0.0.0/8",
+      "url": "http://10.255.255.255",
+      "expected": {
+        "rest": "http://10.255.255.255/api",
+        "webSocket": "ws://10.255.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "the lowest of 172.16.0.0/12",
+      "url": "http://172.16.0.1",
+      "expected": {
+        "rest": "http://172.16.0.1/api",
+        "webSocket": "ws://172.16.0.1/api/v1/ws"
+      }
+    },
+    {
+      "name": "the highest of 172.16.0.0/12",
+      "url": "http://172.31.255.255",
+      "expected": {
+        "rest": "http://172.31.255.255/api",
+        "webSocket": "ws://172.31.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "the highest of 192.168.0.0/16",
+      "url": "http://192.168.255.255",
+      "expected": {
+        "rest": "http://192.168.255.255/api",
+        "webSocket": "ws://192.168.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "the highest of 100.64.0.0/10",
+      "url": "http://100.127.255.255",
+      "expected": {
+        "rest": "http://100.127.255.255/api",
+        "webSocket": "ws://100.127.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "just above 0.0.0.0/8, in https",
+      "url": "https://1.0.0.0",
+      "expected": {
+        "rest": "https://1.0.0.0/api",
+        "webSocket": "wss://1.0.0.0/api/v1/ws"
+      }
+    },
+    {
+      "name": "just below 127.0.0.0/8, in https",
+      "url": "https://126.255.255.255",
+      "expected": {
+        "rest": "https://126.255.255.255/api",
+        "webSocket": "wss://126.255.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "just above 127.0.0.0/8, in https",
+      "url": "https://128.0.0.0",
+      "expected": {
+        "rest": "https://128.0.0.0/api",
+        "webSocket": "wss://128.0.0.0/api/v1/ws"
+      }
+    },
+    {
+      "name": "255.255.255.255 in https",
+      "url": "https://255.255.255.255",
+      "expected": {
+        "rest": "https://255.255.255.255/api",
+        "webSocket": "wss://255.255.255.255/api/v1/ws"
+      }
+    },
+    {
+      "name": "172.32.0.1 in https (public)",
+      "url": "https://172.32.0.1",
+      "expected": {
+        "rest": "https://172.32.0.1/api",
+        "webSocket": "wss://172.32.0.1/api/v1/ws"
+      }
+    },
+    {
+      "name": "a path ending with /api and more",
+      "url": "https://node.example/api/v1",
+      "expected": {
+        "rest": "https://node.example/api/v1/api",
+        "webSocket": "wss://node.example/api/v1/api/v1/ws"
+      }
+    },
+    {
+      "name": "a path ending with /apis",
+      "url": "https://node.example/apis",
+      "expected": {
+        "rest": "https://node.example/apis/api",
+        "webSocket": "wss://node.example/apis/api/v1/ws"
+      }
+    },
+    {
+      "name": "a path with upper case, % and ~",
+      "url": "https://node.example/Mempool/%7Ex~",
+      "expected": {
+        "rest": "https://node.example/Mempool/%7Ex~/api",
+        "webSocket": "wss://node.example/Mempool/%7Ex~/api/v1/ws"
+      }
+    },
+    {
+      "name": "a last label ending with a digit",
+      "url": "https://node.b1",
+      "expected": {
+        "rest": "https://node.b1/api",
+        "webSocket": "wss://node.b1/api/v1/ws"
+      }
+    },
+    {
+      "name": "a name with a hyphen inside",
+      "url": "http://my-node.local:3006/btc",
+      "expected": {
+        "rest": "http://my-node.local:3006/btc/api",
+        "webSocket": "ws://my-node.local:3006/btc/api/v1/ws"
+      }
+    },
+    {
+      "name": "the non-ASCII name nœud.example in its ASCII form (IDNA)",
+      "url": "https://xn--nud-fya.example",
+      "expected": {
+        "rest": "https://xn--nud-fya.example/api",
+        "webSocket": "wss://xn--nud-fya.example/api/v1/ws"
+      }
+    },
+    {
+      "name": "upper case in the scheme",
+      "url": "HTTPS://node.example",
+      "expected": null
+    },
+    {
+      "name": "upper case in the host",
+      "url": "https://Node.example",
+      "expected": null
+    },
+    {
+      "name": "upper case in a local name",
+      "url": "http://umbrel.LOCAL",
+      "expected": null
+    },
+    {
+      "name": "a trailing /",
+      "url": "https://node.example/",
+      "expected": null
+    },
+    {
+      "name": "a path ending with /",
+      "url": "https://node.example/mempool/",
+      "expected": null
+    },
+    {
+      "name": "the Umbrel node with a trailing /",
+      "url": "http://192.168.1.10:3006/",
+      "expected": null
+    },
+    {
+      "name": "/api",
+      "url": "https://node.example/api",
+      "expected": null
+    },
+    {
+      "name": "/API",
+      "url": "https://node.example/API",
+      "expected": null
+    },
+    {
+      "name": "/Api",
+      "url": "http://192.168.1.10:3006/Api",
+      "expected": null
+    },
+    {
+      "name": "/x/api",
+      "url": "https://node.example/x/api",
+      "expected": null
+    },
+    {
+      "name": "a user name",
+      "url": "https://user@node.example",
+      "expected": null
+    },
+    {
+      "name": "a user name and a password",
+      "url": "https://user:pass@node.example",
+      "expected": null
+    },
+    {
+      "name": "@ in the path",
+      "url": "https://node.example/a@b",
+      "expected": null
+    },
+    {
+      "name": "a query",
+      "url": "https://node.example?q",
+      "expected": null
+    },
+    {
+      "name": "a query after a path",
+      "url": "https://node.example/x?q",
+      "expected": null
+    },
+    {
+      "name": "a fragment",
+      "url": "https://node.example#f",
+      "expected": null
+    },
+    {
+      "name": "201 characters",
+      "url": "https://node.example/pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "expected": null
+    },
+    {
+      "name": "localhost",
+      "url": "https://localhost",
+      "expected": null
+    },
+    {
+      "name": "localhost with a port",
+      "url": "http://localhost:3006",
+      "expected": null
+    },
+    {
+      "name": "a name under localhost",
+      "url": "https://a.localhost",
+      "expected": null
+    },
+    {
+      "name": "127.0.0.1",
+      "url": "https://127.0.0.1",
+      "expected": null
+    },
+    {
+      "name": "127.0.0.1 in http",
+      "url": "http://127.0.0.1:3006",
+      "expected": null
+    },
+    {
+      "name": "the highest of 127.0.0.0/8",
+      "url": "https://127.255.255.255",
+      "expected": null
+    },
+    {
+      "name": "0.0.0.0",
+      "url": "https://0.0.0.0",
+      "expected": null
+    },
+    {
+      "name": "the highest of 0.0.0.0/8",
+      "url": "https://0.255.255.255",
+      "expected": null
+    },
+    {
+      "name": "http to a public name",
+      "url": "http://node.example",
+      "expected": null
+    },
+    {
+      "name": "http to a public IPv4 address",
+      "url": "http://8.8.8.8",
+      "expected": null
+    },
+    {
+      "name": "172.32.0.1 in http",
+      "url": "http://172.32.0.1",
+      "expected": null
+    },
+    {
+      "name": "172.15.255.255 in http",
+      "url": "http://172.15.255.255",
+      "expected": null
+    },
+    {
+      "name": "100.128.0.1 in http",
+      "url": "http://100.128.0.1",
+      "expected": null
+    },
+    {
+      "name": "100.63.255.255 in http",
+      "url": "http://100.63.255.255",
+      "expected": null
+    },
+    {
+      "name": "192.169.0.1 in http",
+      "url": "http://192.169.0.1",
+      "expected": null
+    },
+    {
+      "name": "a leading zero in an IPv4 address",
+      "url": "http://010.0.0.1",
+      "expected": null
+    },
+    {
+      "name": "a leading zero inside an IPv4 address",
+      "url": "http://192.168.001.10",
+      "expected": null
+    },
+    {
+      "name": "a number above 255",
+      "url": "https://256.0.0.1",
+      "expected": null
+    },
+    {
+      "name": "3 numbers",
+      "url": "https://8.8.8",
+      "expected": null
+    },
+    {
+      "name": "5 numbers",
+      "url": "https://1.2.3.4.5",
+      "expected": null
+    },
+    {
+      "name": "port 0",
+      "url": "https://node.example:0",
+      "expected": null
+    },
+    {
+      "name": "port 65536",
+      "url": "https://node.example:65536",
+      "expected": null
+    },
+    {
+      "name": "port 0080",
+      "url": "https://node.example:0080",
+      "expected": null
+    },
+    {
+      "name": "an empty port",
+      "url": "https://node.example:",
+      "expected": null
+    },
+    {
+      "name": "a port of 6 digits",
+      "url": "https://node.example:100000",
+      "expected": null
+    },
+    {
+      "name": "a label starting with -",
+      "url": "https://-node.example",
+      "expected": null
+    },
+    {
+      "name": "a label ending with -",
+      "url": "https://node-.example",
+      "expected": null
+    },
+    {
+      "name": "a label of 64 characters",
+      "url": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example",
+      "expected": null
+    },
+    {
+      "name": "a numeric last label",
+      "url": "https://host.123",
+      "expected": null
+    },
+    {
+      "name": "a last label starting with a digit",
+      "url": "https://node.1b",
+      "expected": null
+    },
+    {
+      "name": "a last label starting with -",
+      "url": "https://node.-b",
+      "expected": null
+    },
+    {
+      "name": "a name without a dot",
+      "url": "http://umbrel",
+      "expected": null
+    },
+    {
+      "name": "a name without a dot, in https",
+      "url": "https://umbrel",
+      "expected": null
+    },
+    {
+      "name": "local alone",
+      "url": "http://local",
+      "expected": null
+    },
+    {
+      "name": "a space in the host",
+      "url": "https://node .example",
+      "expected": null
+    },
+    {
+      "name": "a space in the path",
+      "url": "https://node.example/a b",
+      "expected": null
+    },
+    {
+      "name": "a leading space",
+      "url": " https://node.example",
+      "expected": null
+    },
+    {
+      "name": "a trailing space",
+      "url": "https://node.example ",
+      "expected": null
+    },
+    {
+      "name": "a non-ASCII host",
+      "url": "https://nœud.example",
+      "expected": null
+    },
+    {
+      "name": "a non-ASCII path",
+      "url": "https://node.example/é",
+      "expected": null
+    },
+    {
+      "name": "\\ in the path",
+      "url": "https://node.example/a\\b",
+      "expected": null
+    },
+    {
+      "name": "scheme ftp",
+      "url": "ftp://node.example",
+      "expected": null
+    },
+    {
+      "name": "scheme ws",
+      "url": "ws://192.168.1.10:3006",
+      "expected": null
+    },
+    {
+      "name": "no scheme",
+      "url": "node.example",
+      "expected": null
+    },
+    {
+      "name": "no scheme, //",
+      "url": "//node.example",
+      "expected": null
+    },
+    {
+      "name": "one / after the scheme",
+      "url": "https:/node.example",
+      "expected": null
+    },
+    {
+      "name": "IPv6",
+      "url": "https://[::1]",
+      "expected": null
+    },
+    {
+      "name": "IPv6 with a port",
+      "url": "http://[::1]:3006",
+      "expected": null
+    },
+    {
+      "name": "a trailing dot",
+      "url": "https://node.example.",
+      "expected": null
+    },
+    {
+      "name": "an empty label",
+      "url": "https://node..example",
+      "expected": null
+    },
+    {
+      "name": "a name under local, its last label not local",
+      "url": "http://umbrel.local.example",
+      "expected": null
+    },
+    {
+      "name": "a name ending with .localhost under local",
+      "url": "http://umbrel.localhost",
+      "expected": null
+    },
+    {
+      "name": "empty",
+      "url": "",
+      "expected": null
+    }
+  ],
+  "channels": [
+    {
+      "name": "absent",
+      "expected": null
+    },
+    {
+      "name": "an Umbrel node, falling back to mempool.space, for the server only",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false
+      }
+    },
+    {
+      "name": "an Umbrel node, never mempool.space, for the server only",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "none",
+        "payers": false
+      },
+      "expected": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "none",
+        "payers": false
+      }
+    },
+    {
+      "name": "a node in https, for the server only",
+      "value": {
+        "url": "https://node.example/mempool",
+        "fallback": "none",
+        "payers": false
+      },
+      "expected": {
+        "url": "https://node.example/mempool",
+        "fallback": "none",
+        "payers": false
+      }
+    },
+    {
+      "name": "a node of the Internet, for the payers too",
+      "value": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "expected": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": true
+      }
+    },
+    {
+      "name": "a node of the Internet with a port and a path, for the payers too",
+      "value": {
+        "url": "https://node.example:8443/mempool",
+        "fallback": "none",
+        "payers": true
+      },
+      "expected": {
+        "url": "https://node.example:8443/mempool",
+        "fallback": "none",
+        "payers": true
+      }
+    },
+    {
+      "name": "more members, ignored",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false,
+        "name": "Umbrel",
+        "url2": "x",
+        "enabled": false
+      },
+      "expected": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false
+      }
+    },
+    {
+      "name": "payers absent",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool"
+      },
+      "expected": null
+    },
+    {
+      "name": "payers absent, a node of the Internet",
+      "value": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool"
+      },
+      "expected": null
+    },
+    {
+      "name": "payers \"true\" (a string)",
+      "value": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": "true"
+      },
+      "expected": null
+    },
+    {
+      "name": "payers 1",
+      "value": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": 1
+      },
+      "expected": null
+    },
+    {
+      "name": "payers 0",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": 0
+      },
+      "expected": null
+    },
+    {
+      "name": "payers null",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": null
+      },
+      "expected": null
+    },
+    {
+      "name": "payers true, http to a local IPv4 address",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "expected": null
+    },
+    {
+      "name": "payers true, http to a .local name",
+      "value": {
+        "url": "http://umbrel.local",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "expected": null
+    },
+    {
+      "name": "payers true, https to a public IPv4 address",
+      "value": {
+        "url": "https://8.8.8.8",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "expected": null
+    },
+    {
+      "name": "payers true, https to a local IPv4 address",
+      "value": {
+        "url": "https://192.168.1.10:3006",
+        "fallback": "none",
+        "payers": true
+      },
+      "expected": null
+    },
+    {
+      "name": "payers true, https to a .local name",
+      "value": {
+        "url": "https://umbrel.local:3006",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback \"Mempool\"",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "Mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback \"NONE\"",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "NONE",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback \"\"",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback \" mempool\"",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": " mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback null",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": null,
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback false",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": false,
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "fallback absent",
+      "value": {
+        "url": "http://192.168.1.10:3006",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url invalid (http to a public name)",
+      "value": {
+        "url": "http://node.example",
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url invalid (a trailing /)",
+      "value": {
+        "url": "http://192.168.1.10:3006/",
+        "fallback": "none",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url invalid (/api)",
+      "value": {
+        "url": "http://192.168.1.10:3006/api",
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url with a leading space: nothing repaired",
+      "value": {
+        "url": " http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url null",
+      "value": {
+        "url": null,
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url a number",
+      "value": {
+        "url": 3006,
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "url absent",
+      "value": {
+        "fallback": "mempool",
+        "payers": false
+      },
+      "expected": null
+    },
+    {
+      "name": "an empty object",
+      "value": {},
+      "expected": null
+    },
+    {
+      "name": "a string",
+      "value": "http://192.168.1.10:3006",
+      "expected": null
+    },
+    {
+      "name": "an array",
+      "value": [
+        {
+          "url": "http://192.168.1.10:3006",
+          "fallback": "mempool",
+          "payers": false
+        }
+      ],
+      "expected": null
+    },
+    {
+      "name": "null",
+      "value": null,
+      "expected": null
+    },
+    {
+      "name": "true",
+      "value": true,
+      "expected": null
+    },
+    {
+      "name": "a number",
+      "value": 1,
+      "expected": null
+    }
+  ],
+  "reads": [
+    {
+      "name": "no node, mempool.space answers",
+      "node": null,
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["mempool"],
+        "result": "mempool"
+      }
+    },
+    {
+      "name": "no node, mempool.space fails",
+      "node": null,
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["mempool"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback mempool, the node not failed lately, the node answers, mempool.space answers",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": false,
+        "answers": true
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback mempool, the node not failed lately, the node answers, mempool.space fails",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": false,
+        "answers": true
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback mempool, the node not failed lately, the node fails, mempool.space answers",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": false,
+        "answers": false
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node", "mempool"],
+        "result": "mempool"
+      }
+    },
+    {
+      "name": "fallback mempool, the node not failed lately, the node fails, mempool.space fails",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": false,
+        "answers": false
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node", "mempool"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback mempool, the node failed less than 60 s ago, the node answers, mempool.space answers",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": true,
+        "answers": true
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["mempool"],
+        "result": "mempool"
+      }
+    },
+    {
+      "name": "fallback mempool, the node failed less than 60 s ago, the node answers, mempool.space fails",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": true,
+        "answers": true
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["mempool", "node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback mempool, the node failed less than 60 s ago, the node fails, mempool.space answers",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": true,
+        "answers": false
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["mempool"],
+        "result": "mempool"
+      }
+    },
+    {
+      "name": "fallback mempool, the node failed less than 60 s ago, the node fails, mempool.space fails",
+      "node": {
+        "fallback": "mempool",
+        "failedRecently": true,
+        "answers": false
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["mempool", "node"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback none, the node not failed lately, the node answers, mempool.space answers",
+      "node": {
+        "fallback": "none",
+        "failedRecently": false,
+        "answers": true
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback none, the node not failed lately, the node answers, mempool.space fails",
+      "node": {
+        "fallback": "none",
+        "failedRecently": false,
+        "answers": true
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback none, the node not failed lately, the node fails, mempool.space answers",
+      "node": {
+        "fallback": "none",
+        "failedRecently": false,
+        "answers": false
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback none, the node not failed lately, the node fails, mempool.space fails",
+      "node": {
+        "fallback": "none",
+        "failedRecently": false,
+        "answers": false
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback none, the node failed less than 60 s ago, the node answers, mempool.space answers",
+      "node": {
+        "fallback": "none",
+        "failedRecently": true,
+        "answers": true
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback none, the node failed less than 60 s ago, the node answers, mempool.space fails",
+      "node": {
+        "fallback": "none",
+        "failedRecently": true,
+        "answers": true
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node"],
+        "result": "node"
+      }
+    },
+    {
+      "name": "fallback none, the node failed less than 60 s ago, the node fails, mempool.space answers",
+      "node": {
+        "fallback": "none",
+        "failedRecently": true,
+        "answers": false
+      },
+      "mempoolAnswers": true,
+      "expected": {
+        "asked": ["node"],
+        "result": "network"
+      }
+    },
+    {
+      "name": "fallback none, the node failed less than 60 s ago, the node fails, mempool.space fails",
+      "node": {
+        "fallback": "none",
+        "failedRecently": true,
+        "answers": false
+      },
+      "mempoolAnswers": false,
+      "expected": {
+        "asked": ["node"],
+        "result": "network"
+      }
+    }
+  ],
+  "records": [
+    {
+      "name": "version 2, no bitcoinNode: mempool.space",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, a node of the Internet, falling back to mempool.space",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example",
+          "fallback": "mempool"
+        }
+      },
+      "expected": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool"
+      }
+    },
+    {
+      "name": "version 2, a node of the Internet, never mempool.space",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://node.example:8443/mempool",
+          "fallback": "none"
+        }
+      },
+      "expected": {
+        "url": "https://node.example:8443/mempool",
+        "fallback": "none"
+      }
+    },
+    {
+      "name": "version 2, more members ignored (payers among them)",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example",
+          "fallback": "none",
+          "payers": false,
+          "x": 1
+        }
+      },
+      "expected": {
+        "url": "https://mempool.shop.example",
+        "fallback": "none"
+      }
+    },
+    {
+      "name": "version 2, http to a local address: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "http://192.168.1.10:3006",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, http to a .local name: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "http://umbrel.local",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, https to an IPv4 address: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://8.8.8.8",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, https to a .local name: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://umbrel.local",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, a URL that is not a node URL: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example/api",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, an unknown fallback: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example",
+          "fallback": "Mempool"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, no fallback: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example"
+        }
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, null: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": null
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, a string: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": "https://mempool.shop.example"
+      },
+      "expected": null
+    },
+    {
+      "name": "version 2, an array: set aside",
+      "value": {
+        "version": 2,
+        "businessName": "Sunrise Bakery",
+        "invoice": null,
+        "verifyUrl": null,
+        "fiat": null,
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "onchainAddress": "bc1p4gmh64rd4m5y5nn8hwfnvtz2mm6lngpmwys5a257klyg03ju0pyqu65xe8",
+        "sats": 150000000,
+        "createdAt": 1791381280,
+        "expiresAt": 1791382180,
+        "bitcoinNode": [
+          {
+            "url": "https://mempool.shop.example",
+            "fallback": "mempool"
+          }
+        ]
+      },
+      "expected": null
+    },
+    {
+      "name": "version 1, a node of the Internet: ignored",
+      "value": {
+        "version": 1,
+        "businessName": "Sunrise Bakery",
+        "invoice": "lnbc210n1p4vvsmgpp5mpepfjvqftecc5jg50t6j7pa929spkv30zwx04xj9jql8qhh9qussp5r7d725tw2vf7345mtmuuypcsav4sh2qp6663qxs2al3q8855qwxqxqzurnp4qvyndeaqzman7h898jxm98dzkm0mlrsx36s93smrur7h0azyyuxc5rzjqwghf7zxvfkxq5a6sr65g0gdkv768p83mhsnt0msszapamzx2qvuxqqqqrt49lmtcqqqqqqqqqqq86qq9qcqzpuhp5gs8l6ck7jdsa9qx8u2ydgl6q933mn2047j5nw9f9xeknle3ujltq9qyyssqsjvk6t43cmgncdn8z783r2gym2u80dh5xa2xmw2u0a9aykhww3z9tdj4m5kvxt6yme90c0g0gauf008hr70lx5jdkzfzn7hwa73axxsqy9rcwv",
+        "verifyUrl": "https://breez.tips/lnurlp/verify/d87214c9804af38c5248a3d7a9783d2a8b00d991789c67d4d22c81f382f72839",
+        "fiat": {
+          "minor": 2,
+          "digits": 2,
+          "currency": "CHF"
+        },
+        "note": "Order 1042",
+        "redirectUrl": "https://shop.example/orders/1042/thanks",
+        "bitcoinNode": {
+          "url": "https://mempool.shop.example",
+          "fallback": "mempool"
+        }
+      },
+      "expected": null
+    }
+  ],
+  "writes": [
+    {
+      "name": "no node, an address",
+      "address": true,
+      "expected": null
+    },
+    {
+      "name": "a node for the server only, an address",
+      "channel": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": false
+      },
+      "address": true,
+      "expected": null
+    },
+    {
+      "name": "a node for the payers too, an address",
+      "channel": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "address": true,
+      "expected": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool"
+      }
+    },
+    {
+      "name": "a node for the payers too, never mempool.space, an address",
+      "channel": {
+        "url": "https://node.example:8443/mempool",
+        "fallback": "none",
+        "payers": true
+      },
+      "address": true,
+      "expected": {
+        "url": "https://node.example:8443/mempool",
+        "fallback": "none"
+      }
+    },
+    {
+      "name": "a node for the payers too, more members not copied",
+      "channel": {
+        "url": "https://mempool.shop.example",
+        "fallback": "none",
+        "payers": true,
+        "name": "Shop node"
+      },
+      "address": true,
+      "expected": {
+        "url": "https://mempool.shop.example",
+        "fallback": "none"
+      }
+    },
+    {
+      "name": "a node for the payers too, no address (version 1)",
+      "channel": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "address": false,
+      "expected": null
+    },
+    {
+      "name": "an invalid node (payers true on a local address), an address",
+      "channel": {
+        "url": "http://192.168.1.10:3006",
+        "fallback": "mempool",
+        "payers": true
+      },
+      "address": true,
+      "expected": null
+    },
+    {
+      "name": "an invalid node (payers absent), an address",
+      "channel": {
+        "url": "https://mempool.shop.example",
+        "fallback": "mempool"
+      },
+      "address": true,
+      "expected": null
+    }
+  ]
+}

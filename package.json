@@ -1,0 +1,27 @@
+{
+  "name": "checkout-spec-checks",
+  "private": true,
+  "description": "The checks of this repository's CI: manifest, schemas, links, format, and part of the vectors computed again. Not a package.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "manifest": "node scripts/manifest.mjs",
+    "manifest:check": "node scripts/manifest.mjs --check",
+    "schemas": "node scripts/schemas.mjs",
+    "links": "node scripts/links.mjs",
+    "recompute": "node scripts/recompute.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run manifest:check && npm run schemas && npm run links && npm run format:check && npm run recompute"
+  },
+  "devDependencies": {
+    "@noble/ciphers": "2.4.0",
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0",
+    "ajv": "8.20.0",
+    "prettier": "3.9.10"
+  }
+}

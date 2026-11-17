@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/checkout-rest.schema.json",
+  "title": "vectors/app/checkout-rest.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "order": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sats": {
+          "$ref": "common.schema.json#/$defs/digits"
+        },
+        "note": {
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "integer"
+        },
+        "checkout": {
+          "const": true
+        },
+        "redirectUrl": {
+          "type": "string"
+        }
+      },
+      "required": ["ref", "sats", "note", "durationSeconds", "checkout", "redirectUrl"],
+      "additionalProperties": false
+    },
+    "payRequest": {
+      "$ref": "common.schema.json#/$defs/payRequest"
+    },
+    "integrationKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "origin": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "relays": {
+      "$ref": "common.schema.json#/$defs/relays"
+    },
+    "onchainAddress": {
+      "$ref": "common.schema.json#/$defs/depositAddress"
+    },
+    "sats": {
+      "$ref": "common.schema.json#/$defs/digits"
+    },
+    "createdAt": {
+      "$ref": "common.schema.json#/$defs/unixSeconds"
+    },
+    "expiresAt": {
+      "$ref": "common.schema.json#/$defs/unixSeconds"
+    },
+    "transaction": {
+      "type": "object",
+      "properties": {
+        "txid": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "sats": {
+          "$ref": "common.schema.json#/$defs/digits"
+        }
+      },
+      "required": ["txid", "sats"],
+      "additionalProperties": false
+    },
+    "link": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "linkKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "author": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "address": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "encryptionKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "const": 2
+            },
+            "businessName": {
+              "type": "string"
+            },
+            "invoice": {
+              "type": ["string", "null"]
+            },
+            "verifyUrl": {
+              "type": ["string", "null"]
+            },
+            "onchainAddress": {
+              "$ref": "common.schema.json#/$defs/depositAddress"
+            },
+            "sats": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "createdAt": {
+              "$ref": "common.schema.json#/$defs/unixSeconds"
+            },
+            "expiresAt": {
+              "$ref": "common.schema.json#/$defs/unixSeconds"
+            },
+            "fiat": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "common.schema.json#/$defs/declaredFiat"
+                }
+              ]
+            },
+            "note": {
+              "type": "string"
+            },
+            "redirectUrl": {
+              "type": ["string", "null"]
+            },
+            "restAuthor": {
+              "$ref": "common.schema.json#/$defs/hex32"
+            },
+            "restKey": {
+              "$ref": "common.schema.json#/$defs/hex32"
+            }
+          },
+          "required": [
+            "version",
+            "businessName",
+            "invoice",
+            "verifyUrl",
+            "onchainAddress",
+            "sats",
+            "createdAt",
+            "expiresAt",
+            "fiat",
+            "note",
+            "redirectUrl",
+            "restAuthor",
+            "restKey"
+          ],
+          "additionalProperties": false
+        },
+        "event": {
+          "$ref": "common.schema.json#/$defs/event"
+        }
+      },
+      "required": ["url", "linkKey", "author", "address", "encryptionKey", "value", "event"],
+      "additionalProperties": false
+    },
+    "rest": {
+      "type": "object",
+      "properties": {
+        "restKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "restAuthor": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "encryptionKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "address": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "invoice": {
+          "type": "string",
+          "pattern": "^lnbc"
+        },
+        "paymentHash": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "verifyUrl": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "sats": {
+          "$ref": "common.schema.json#/$defs/digits"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "const": 1
+            },
+            "invoice": {
+              "type": "string"
+            },
+            "verifyUrl": {
+              "type": "string"
+            }
+          },
+          "required": ["version", "invoice", "verifyUrl"],
+          "additionalProperties": false
+        },
+        "event": {
+          "$ref": "common.schema.json#/$defs/event"
+        }
+      },
+      "required": [
+        "restKey",
+        "restAuthor",
+        "encryptionKey",
+        "address",
+        "invoice",
+        "paymentHash",
+        "verifyUrl",
+        "sats",
+        "value",
+        "event"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "$ref": "common.schema.json#/$defs/paymentStatus"
+    }
+  },
+  "required": [
+    "source",
+    "order",
+    "payRequest",
+    "integrationKey",
+    "origin",
+    "relays",
+    "onchainAddress",
+    "sats",
+    "createdAt",
+    "expiresAt",
+    "transaction",
+    "link",
+    "rest",
+    "status"
+  ],
+  "additionalProperties": false
+}

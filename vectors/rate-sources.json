@@ -1,0 +1,520 @@
+{
+  "description": "Rate sources (SPEC.md §26, Rate sources). `statuses`: the error of a source that answers with an HTTP status other than 2xx (a redirect is no answer, SPEC.md §15). `default`: the list a client without `rateSource` asks, in order. `values`: a client's `rateSource` (absent when the case has none) and the sources it names, in the order they are asked, or the error; an order's `rateSource` gives `invalid_order` instead, and an order without one asks the client's. `lists`: the sources of a list asked one at a time for a price in `currency` at `now`, each doing what `answers` says: raise an error (\"network\", \"rate\", \"unsupported_currency\") or give a price, checked as SPEC.md §25 says (invalid, too old or too far ahead: \"rate\"). Expected: the source whose price is the rate, the RateInfo's `price`, and the sources asked, in order; or the error.",
+  "statuses": [
+    {
+      "status": 301,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 302,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 400,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 403,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 404,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 408,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 418,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 429,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 499,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 500,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 502,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 503,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 599,
+      "expected": {
+        "error": "network"
+      }
+    },
+    {
+      "status": 600,
+      "expected": {
+        "error": "rate"
+      }
+    },
+    {
+      "status": 999,
+      "expected": {
+        "error": "rate"
+      }
+    }
+  ],
+  "default": ["coingecko", "mempool", "coinbase", "kraken", "opennode"],
+  "values": [
+    {
+      "name": "absent: the default list",
+      "expected": {
+        "sources": ["coingecko", "mempool", "coinbase", "kraken", "opennode"]
+      }
+    },
+    {
+      "name": "a name",
+      "rateSource": "kraken",
+      "expected": {
+        "sources": ["kraken"]
+      }
+    },
+    {
+      "name": "another name",
+      "rateSource": "opennode",
+      "expected": {
+        "sources": ["opennode"]
+      }
+    },
+    {
+      "name": "a list of one",
+      "rateSource": ["coingecko"],
+      "expected": {
+        "sources": ["coingecko"]
+      }
+    },
+    {
+      "name": "a list, its order kept",
+      "rateSource": ["kraken", "coingecko"],
+      "expected": {
+        "sources": ["kraken", "coingecko"]
+      }
+    },
+    {
+      "name": "every name, the other way round",
+      "rateSource": ["opennode", "kraken", "coinbase", "mempool", "coingecko"],
+      "expected": {
+        "sources": ["opennode", "kraken", "coinbase", "mempool", "coingecko"]
+      }
+    },
+    {
+      "name": "an empty list",
+      "rateSource": [],
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "a name twice",
+      "rateSource": ["coingecko", "mempool", "coingecko"],
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "an unknown name",
+      "rateSource": "coinmarketcap",
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "a name in another case",
+      "rateSource": "CoinGecko",
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "custom: a function, never a name",
+      "rateSource": "custom",
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "an empty string",
+      "rateSource": "",
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "names in one string",
+      "rateSource": "coingecko,mempool",
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "a list with an unknown name",
+      "rateSource": ["coingecko", "bitstamp"],
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "a list inside a list",
+      "rateSource": [["coingecko"]],
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "null",
+      "rateSource": null,
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "a number",
+      "rateSource": 1,
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    },
+    {
+      "name": "an object",
+      "rateSource": {
+        "name": "coingecko"
+      },
+      "expected": {
+        "error": "invalid_option",
+        "param": "rateSource"
+      }
+    }
+  ],
+  "lists": {
+    "currency": "CHF",
+    "now": 1791378000,
+    "cases": [
+      {
+        "name": "the first source gives the rate: no other is asked",
+        "sources": ["coingecko", "mempool"],
+        "answers": {
+          "coingecko": {
+            "price": "69012.5",
+            "time": 1791377940
+          },
+          "mempool": {
+            "price": "70000",
+            "time": 1791378000
+          }
+        },
+        "expected": {
+          "source": "coingecko",
+          "price": "69012.5",
+          "asked": ["coingecko"]
+        }
+      },
+      {
+        "name": "the first source does not answer: the next one",
+        "sources": ["coingecko", "mempool"],
+        "answers": {
+          "coingecko": "network",
+          "mempool": {
+            "price": "69012.50",
+            "time": 1791377970
+          }
+        },
+        "expected": {
+          "source": "mempool",
+          "price": "69012.5",
+          "asked": ["coingecko", "mempool"]
+        }
+      },
+      {
+        "name": "an invalid answer: the next one",
+        "sources": ["coingecko", "mempool"],
+        "answers": {
+          "coingecko": "rate",
+          "mempool": {
+            "price": "69012",
+            "time": 1791378000
+          }
+        },
+        "expected": {
+          "source": "mempool",
+          "price": "69012",
+          "asked": ["coingecko", "mempool"]
+        }
+      },
+      {
+        "name": "no price in the currency: the next one",
+        "sources": ["mempool", "coinbase"],
+        "answers": {
+          "mempool": "unsupported_currency",
+          "coinbase": {
+            "price": "68990.123456789",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "coinbase",
+          "price": "68990.123456789",
+          "asked": ["mempool", "coinbase"]
+        }
+      },
+      {
+        "name": "a price older than an hour: the next one",
+        "sources": ["coingecko", "kraken"],
+        "answers": {
+          "coingecko": {
+            "price": "69000",
+            "time": 1791374399
+          },
+          "kraken": {
+            "price": "69010.1",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "kraken",
+          "price": "69010.1",
+          "asked": ["coingecko", "kraken"]
+        }
+      },
+      {
+        "name": "a price an hour old: kept",
+        "sources": ["coingecko", "kraken"],
+        "answers": {
+          "coingecko": {
+            "price": "69000",
+            "time": 1791374400
+          },
+          "kraken": {
+            "price": "69010.1",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "coingecko",
+          "price": "69000",
+          "asked": ["coingecko"]
+        }
+      },
+      {
+        "name": "a price dated too far ahead: the next one",
+        "sources": ["coingecko", "mempool"],
+        "answers": {
+          "coingecko": {
+            "price": "69000",
+            "time": 1791378301
+          },
+          "mempool": {
+            "price": "69001",
+            "time": 1791378000
+          }
+        },
+        "expected": {
+          "source": "mempool",
+          "price": "69001",
+          "asked": ["coingecko", "mempool"]
+        }
+      },
+      {
+        "name": "a price of zero: the next one",
+        "sources": ["coinbase", "kraken"],
+        "answers": {
+          "coinbase": {
+            "price": "0",
+            "time": null
+          },
+          "kraken": {
+            "price": "69010.1",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "kraken",
+          "price": "69010.1",
+          "asked": ["coinbase", "kraken"]
+        }
+      },
+      {
+        "name": "a price that is not a decimal: the next one",
+        "sources": ["coinbase", "opennode"],
+        "answers": {
+          "coinbase": {
+            "price": "-69000",
+            "time": null
+          },
+          "opennode": {
+            "price": "6.9e4",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "opennode",
+          "price": "69000",
+          "asked": ["coinbase", "opennode"]
+        }
+      },
+      {
+        "name": "the default list, every source down but the last",
+        "sources": ["coingecko", "mempool", "coinbase", "kraken", "opennode"],
+        "answers": {
+          "coingecko": "network",
+          "mempool": "network",
+          "coinbase": "rate",
+          "kraken": "unsupported_currency",
+          "opennode": {
+            "price": "69000.50",
+            "time": null
+          }
+        },
+        "expected": {
+          "source": "opennode",
+          "price": "69000.5",
+          "asked": ["coingecko", "mempool", "coinbase", "kraken", "opennode"]
+        }
+      },
+      {
+        "name": "the list's order, not the default one's",
+        "sources": ["kraken", "coingecko"],
+        "answers": {
+          "kraken": {
+            "price": "69010.1",
+            "time": null
+          },
+          "coingecko": {
+            "price": "69012.5",
+            "time": 1791378000
+          }
+        },
+        "expected": {
+          "source": "kraken",
+          "price": "69010.1",
+          "asked": ["kraken"]
+        }
+      },
+      {
+        "name": "one source: its error, no other asked",
+        "sources": ["kraken"],
+        "answers": {
+          "kraken": "network",
+          "coingecko": {
+            "price": "69012.5",
+            "time": 1791378000
+          }
+        },
+        "expected": {
+          "error": "network",
+          "asked": ["kraken"]
+        }
+      },
+      {
+        "name": "one source without the currency",
+        "sources": ["mempool"],
+        "answers": {
+          "mempool": "unsupported_currency"
+        },
+        "expected": {
+          "error": "unsupported_currency",
+          "asked": ["mempool"]
+        }
+      },
+      {
+        "name": "no source has the currency",
+        "sources": ["coingecko", "coinbase", "opennode"],
+        "answers": {
+          "coingecko": "unsupported_currency",
+          "coinbase": "unsupported_currency",
+          "opennode": "unsupported_currency"
+        },
+        "expected": {
+          "error": "unsupported_currency",
+          "asked": ["coingecko", "coinbase", "opennode"]
+        }
+      },
+      {
+        "name": "no price: the last error that is not unsupported_currency",
+        "sources": ["coingecko", "mempool", "coinbase"],
+        "answers": {
+          "coingecko": "network",
+          "mempool": "rate",
+          "coinbase": "unsupported_currency"
+        },
+        "expected": {
+          "error": "rate",
+          "asked": ["coingecko", "mempool", "coinbase"]
+        }
+      },
+      {
+        "name": "no price: a network error last",
+        "sources": ["coingecko", "mempool"],
+        "answers": {
+          "coingecko": "rate",
+          "mempool": "network"
+        },
+        "expected": {
+          "error": "network",
+          "asked": ["coingecko", "mempool"]
+        }
+      },
+      {
+        "name": "no price: a network error between two without the currency",
+        "sources": ["coingecko", "mempool", "kraken"],
+        "answers": {
+          "coingecko": "unsupported_currency",
+          "mempool": "network",
+          "kraken": "unsupported_currency"
+        },
+        "expected": {
+          "error": "network",
+          "asked": ["coingecko", "mempool", "kraken"]
+        }
+      }
+    ]
+  }
+}

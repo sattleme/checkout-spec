@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/manifest.schema.json",
+  "title": "manifest.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "protocol": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "files": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^(SPEC\\.md|PORTING\\.md|currencies\\.json|vectors/([A-Za-z0-9_-][A-Za-z0-9._-]*/)*[A-Za-z0-9_-][A-Za-z0-9._-]*)$"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/sha256"
+      }
+    }
+  },
+  "required": ["description", "version", "protocol", "files"],
+  "additionalProperties": false
+}

@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/relay-reads.schema.json",
+  "title": "vectors/relay-reads.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "limit": {
+      "const": 100
+    },
+    "pages": {
+      "const": 20
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "oneOf": [
+                {
+                  "const": "fails"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "oneOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    ],
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              ]
+            }
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "untils": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "common.schema.json#/$defs/unixSeconds"
+                    }
+                  ]
+                }
+              },
+              "answered": {
+                "type": "boolean"
+              },
+              "complete": {
+                "type": "boolean"
+              },
+              "kept": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": ["untils", "answered", "complete", "kept"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "pages", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "lists": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relays": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "enum": ["complete", "incomplete", "failed"]
+            }
+          },
+          "expected": {
+            "type": "boolean"
+          }
+        },
+        "required": ["name", "relays", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "paged": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 21,
+            "items": {
+              "oneOf": [
+                {
+                  "const": "fails"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      {
+                        "oneOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    ],
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              ]
+            }
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "untils": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "common.schema.json#/$defs/unixSeconds"
+                    }
+                  ]
+                }
+              },
+              "answered": {
+                "type": "boolean"
+              },
+              "kept": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": ["untils", "answered", "kept"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "pages", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "onEveryRelay": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "relays": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "enum": ["complete", "incomplete", "failed", "reading"]
+            }
+          },
+          "expected": {
+            "type": "object",
+            "properties": {
+              "answered": {
+                "type": "boolean"
+              },
+              "complete": {
+                "type": "boolean"
+              }
+            },
+            "required": ["answered", "complete"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "relays", "expected"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "limit", "pages", "cases", "lists", "paged", "onEveryRelay"],
+  "additionalProperties": false
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/nostr-events.schema.json",
+  "title": "vectors/nostr-events.json",
+  "type": "object",
+  "properties": {
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "event": {
+            "type": "object",
+            "properties": {
+              "pubkey": {
+                "$ref": "common.schema.json#/$defs/hex32"
+              },
+              "created_at": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "kind": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": ["pubkey", "created_at", "kind", "tags", "content"],
+            "additionalProperties": false
+          },
+          "serialized": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          }
+        },
+        "required": ["name", "event", "serialized", "id"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["description", "cases"],
+  "additionalProperties": false
+}

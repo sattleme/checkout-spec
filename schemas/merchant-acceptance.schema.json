@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sattleme/checkout-spec/schemas/merchant-acceptance.schema.json",
+  "title": "vectors/app/merchant-acceptance.json",
+  "type": "object",
+  "properties": {
+    "source": {
+      "$ref": "common.schema.json#/$defs/source"
+    },
+    "secretKey": {
+      "type": "string",
+      "pattern": "^sattleme_ck_"
+    },
+    "team": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "channelEncryptionKey": {
+      "$ref": "common.schema.json#/$defs/hex32"
+    },
+    "invoices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "saleKey": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "sale": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          },
+          "onchainAddress": {
+            "$ref": "common.schema.json#/$defs/depositAddress"
+          },
+          "expiresAt": {
+            "$ref": "common.schema.json#/$defs/unixSeconds"
+          },
+          "sats": {
+            "$ref": "common.schema.json#/$defs/digits"
+          },
+          "acceptanceAddress": {
+            "$ref": "common.schema.json#/$defs/hex32"
+          }
+        },
+        "required": [
+          "ref",
+          "saleKey",
+          "sale",
+          "onchainAddress",
+          "expiresAt",
+          "sats",
+          "acceptanceAddress"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "invoice": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "event": {
+            "$ref": "common.schema.json#/$defs/event"
+          },
+          "expected": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "const": "newer"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "received": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "createdAt": {
+                    "$ref": "common.schema.json#/$defs/unixSeconds"
+                  }
+                },
+                "required": ["received", "createdAt"],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": ["name", "invoice", "event", "expected"],
+        "additionalProperties": false
+      }
+    },
+    "made": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "common.schema.json#/$defs/source"
+        },
+        "teamSecret": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "team": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "secretKey": {
+          "type": "string",
+          "pattern": "^sattleme_ck_"
+        },
+        "otherIntegrationKey": {
+          "$ref": "common.schema.json#/$defs/hex32"
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "invoice": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "event": {
+                "$ref": "common.schema.json#/$defs/event"
+              },
+              "expected": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "const": "newer"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "received": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "createdAt": {
+                        "$ref": "common.schema.json#/$defs/unixSeconds"
+                      }
+                    },
+                    "required": ["received", "createdAt"],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": ["name", "invoice", "event", "expected"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["source", "teamSecret", "team", "secretKey", "otherIntegrationKey", "records"],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "source",
+    "secretKey",
+    "team",
+    "channelEncryptionKey",
+    "invoices",
+    "records",
+    "made"
+  ],
+  "additionalProperties": false
+}
